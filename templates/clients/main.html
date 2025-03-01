@@ -7,7 +7,7 @@
             <div class="container mx-auto px-4">
                 <div class="flex justify-between items-center mb-8">
                     <h1 class="text-2xl">База даних клієнтів</h1>
-                    <button class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                    <button id="open-modal" class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
                         <i class="fa-solid fa-plus mr-2"></i>Додати клієнта
                     </button>
                 </div>
@@ -24,53 +24,98 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-100">
-                            <tr class="hover:bg-neutral-50">
-                                <td class="px-6 py-4 text-sm">#12345</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <span>Джон Сміт</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">Бізнес</td>
-                                <td class="px-6 py-4">123 Бізнес Авеню</td>
-                                <td class="px-6 py-4">
-                                    <div>john@email.com</div>
-                                    <div class="text-neutral-500">+1 234 567 890</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex space-x-2">
-                                        <button class="text-neutral-600 hover:text-neutral-900"><i
-                                                class="fa-solid fa-pen"></i></button>
-                                        <button class="text-neutral-600 hover:text-neutral-900"><i
-                                                class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-neutral-50">
-                                <td class="px-6 py-4 text-sm">#12346</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center">
-                                        <span>Сара Джонсон</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">Індивідуальний</td>
-                                <td class="px-6 py-4">456 Домашня Вулиця</td>
-                                <td class="px-6 py-4">
-                                    <div>sarah@email.com</div>
-                                    <div class="text-neutral-500">+1 234 567 891</div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex space-x-2">
-                                        <button class="text-neutral-600 hover:text-neutral-900"><i
-                                                class="fa-solid fa-pen"></i></button>
-                                        <button class="text-neutral-600 hover:text-neutral-900"><i
-                                                class="fa-solid fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
+                            {% for client in page_obj %}
+                <tr class="hover:bg-neutral-50">
+                    <td class="px-6 py-4 text-sm">#{{ client.id }}</td>
+                    <td class="px-6 py-4">{{ client.name }}</td>
+                    <td class="px-6 py-4">{{ client.client_type.name }}</td> <!-- Assuming FK relation -->
+                    <td class="px-6 py-4">{{ client.address }}</td>
+                    <td class="px-6 py-4">
+                        <div>{{ client.email }}</div>
+                        <div class="text-neutral-500">{{ client.phone }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex space-x-2">
+                            <button class="edit-client text-neutral-600 hover:text-neutral-900"
+                        data-id="{{ client.id }}"
+                        data-name="{{ client.name }}"
+                        data-type="{{ client.client_type.id }}"
+                        data-address="{{ client.address }}"
+                        data-phone="{{ client.phone }}"
+                        data-email="{{ client.email }}"
+                        data-passporst_id="{{ client.passport_id }}"
+                        data-iin="{{ client.iin }}"
+                        data-edrpou="{{ client.edrpou }}">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+
+                    <!-- Delete Button -->
+                    <button id="delete-client" class="delete-client text-neutral-600 hover:text-neutral-900" data-id="{{ client.id }}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-        </main>
+
+    <div class="mt-4 flex justify-center">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="px-3 py-2 bg-gray-300 rounded">Перша</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 bg-gray-300 rounded">←</a>
+        {% endif %}
+
+        <span class="px-3 py-2 bg-gray-400 text-white rounded">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 bg-gray-300 rounded">→</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 bg-gray-300 rounded">Остання</a>
+        {% endif %}
+    </div>
+    </main>
+
+    <div id="delete-modal-overlay" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+        <div class="bg-white p-6 rounded-lg w-96">
+            <h3 class="text-lg font-semibold text-neutral-800">Ви впевнені, що хочете видалити цього клієнта?</h3>
+            <div class="flex justify-end space-x-4 pt-4">
+                <button id="cancel-delete" class="px-4 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50">Скасувати</button>
+                <button id="confirm-delete" class="px-4 py-2 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800">Видалити</button>
+            </div>
+        </div>
+    </div>
+
+    {% include "clients/modal_client.html" %}
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modalOverlay = document.getElementById('modal-overlay');
+    const openModalBtn = document.getElementById('open-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const clientForm = document.getElementById('client-form');
+
+    document.querySelectorAll('.edit-client').forEach(button => {
+        button.addEventListener('click', function () {
+            document.getElementById('clientId').value = this.dataset.id;
+            document.getElementById('clientName').value = this.dataset.name;
+            document.getElementById('clientType').value = this.dataset.type;
+            document.getElementById('clientAddress').value = this.dataset.address;
+            document.getElementById('clientPhone').value = this.dataset.phone;
+            document.getElementById('clientEmail').value = this.dataset.email;
+            document.getElementById('clientPassportId').value = this.dataset.passport_id;
+            document.getElementById('clientIin').value = this.dataset.iin;
+            document.getElementById('clientEdrpou').value = this.dataset.edrpou;
+
+            clientForm.action = `/edit_client/${this.dataset.id}/`;
+            modalOverlay.classList.remove('hidden');
+        });
+    });
+
+    openModalBtn.addEventListener('click', function () {
+        modalOverlay.classList.remove('hidden');
+    });
+});
+</script>
+
 {% endblock %}

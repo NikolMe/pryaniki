@@ -1,0 +1,77 @@
+<div id="modal-overlay" class="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 hidden">
+    <div class="flex justify-center items-center h-full">
+        <div id="modal-content" class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+            <button id="close-modal" class="absolute top-2 right-2 text-neutral-600">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <form id="client-form" class="space-y-4" method="post" action="{% url 'add_client' %}">
+                {% csrf_token %}
+                <input type="hidden" id="clientId" name="client_id">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm text-neutral-600">Тип Клієнта</label>
+                        <select id="clientType" name="client_type"
+                            class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-400">
+                            {% for client_type in client_types %}
+                                <option value="{{ client_type.id }}">{{ client_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm text-neutral-600">Ім'я</label>
+                        <input type="text" id="clientName" name="name"
+                            class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-400"
+                            placeholder="Введіть Ім'я">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm text-neutral-600">Адреса</label>
+                        <input type="text" id="clientAddress" name="address"
+                            class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-400"
+                            placeholder="Введіть Адресу">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm text-neutral-600">Телефон</label>
+                        <input type="tel" id="clientPhone" name="phone"
+                            class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-400"
+                            placeholder="Введіть Телефон">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm text-neutral-600">Електронна Пошта</label>
+                        <input type="email" id="clientEmail" name="email"
+                            class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-400"
+                            placeholder="Введіть Електронну Пошту">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm text-neutral-600">ID Паспорта</label>
+                        <input id="clientPassportId" name="passportId"
+                            class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-400"
+                            placeholder="Введіть ID Паспорта">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm text-neutral-600">ІПН</label>
+                        <input id="clientIin" name="iin"
+                            class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-400"
+                            placeholder="Введіть ІПН">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm text-neutral-600">ЄДРПОУ</label>
+                        <input id="clientEdrpou" name="edrpou"
+                            class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-neutral-400"
+                            placeholder="Введіть ЄДРПОУ">
+                    </div>
+
+                </div>
+                <div class="flex justify-end space-x-4 pt-6">
+                    <button type="button" id="close-modal"
+                        class="px-4 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50">
+                        Скасувати
+                    </button>
+                    <button type="submit" id="save-client" class="px-4 py-2 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800">
+                        Зберегти Клієнта
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
