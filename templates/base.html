@@ -334,12 +334,12 @@
                         <span class="text-xl text-white">Pryaniki_PRIME</span>
                     </div>
                     <nav class="hidden md:flex space-x-8">
-                        <span class="text-white border-b-2 border-white cursor-pointer">Головна</span>
-                        <span class="text-neutral-200 hover:text-white cursor-pointer">Клієнти</span>
-                        <span class="text-neutral-200 hover:text-white cursor-pointer">Послуги</span>
-                        <span class="text-neutral-200 hover:text-white cursor-pointer">Знижки</span>
-                        <span class="text-neutral-200 hover:text-white cursor-pointer">Рахунки на оплату</span>
-                        <span class="text-neutral-200 hover:text-white cursor-pointer">Надані послуги</span>
+                        <a href="{% url 'home' %}" class="text-white border-b-2 border-white cursor-pointer">Головна</a>
+                        <a href="{% url 'clients' %}" class="text-neutral-200 hover:text-white cursor-pointer">Клієнти</a>
+                        <a href="{% url 'services' %}" class="text-neutral-200 hover:text-white cursor-pointer">Послуги</a>
+                        <a href="{% url 'discounts' %}" class="text-neutral-200 hover:text-white cursor-pointer">Знижки</a>
+                        <a href="{% url 'payments' %}" class="text-neutral-200 hover:text-white cursor-pointer">Рахунки на оплату</a>
+                        <a href="{% url 'provided_services' %}" class="text-neutral-200 hover:text-white cursor-pointer">Надані послуги</a>
                     </nav>
                 </div>
             </div>

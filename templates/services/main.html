@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Real Agency{% endblock %}
+
+{% block content %}
+<main id="main" class="pt-24">
+            <div class="container mx-auto px-4">
+                <div id="services-header" class="flex justify-between items-center mb-8">
+                    <h1 class="text-2xl">Управління послугами</h1>
+                </div>
+                <div id="services-filters" class="bg-neutral-50 p-6 rounded-xl mb-8 grid grid-cols-4 gap-4 items-center">
+                    <input type="text" placeholder="Пошук послуг..." class="border border-neutral-200 rounded-lg px-4 py-2" />
+                    <select class="border border-neutral-200 rounded-lg px-4 py-2">
+                        <option>Сортувати за</option>
+                        <option>Назва A-Z</option>
+                        <option>Назва Z-А</option>
+                        <option>Ціна від низької до високої</option>
+                        <option>Ціна від високої до низької</option>
+                    </select>
+                    <div class="col-span-2 flex justify-end">
+                        <button class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                            <i class="fa-solid fa-plus mr-2"></i>Додати нову послугу
+                        </button>
+                    </div>
+                </div>
+                <div id="services-table" class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-neutral-50 border-b border-neutral-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm text-neutral-600">ID</th>
+                                <th class="px-6 py-3 text-left text-sm text-neutral-600">Назва</th>
+                                <th class="px-6 py-3 text-left text-sm text-neutral-600">Опис</th>
+                                <th class="px-6 py-3 text-left text-sm text-neutral-600">Вартість</th>
+                                <th class="px-6 py-3 text-central text-sm text-neutral-600">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-200">
+                            <tr class="hover:bg-neutral-50">
+                                <td class="px-6 py-4 text-sm">#12345</td>
+                                <td class="px-6 py-4">Автентифікація документів</td>
+                                <td class="px-6 py-4">Професійні послуги автентифікації</td>
+                                <td class="px-6 py-4 text-left">234.00 UAH</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-center space-x-3">
+                                        <button class="text-neutral-600 hover:text-neutral-900">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button class="text-neutral-600 hover:text-neutral-900">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-neutral-50">
+                                <td class="px-6 py-4 text-sm">#12346</td>
+                                <td class="px-6 py-4">Юридична сертифікація</td>
+                                <td class="px-6 py-4">Офіційна сертифікація документів</td>
+                                <td class="px-6 py-4 text-left">214.00 UAH</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-center space-x-3">
+                                        <button class="text-neutral-600 hover:text-neutral-900">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button class="text-neutral-600 hover:text-neutral-900">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-neutral-50">
+                                <td class="px-6 py-4 text-sm">#12347</td>
+                                <td class="px-6 py-4">Перевірка договорів</td>
+                                <td class="px-6 py-4">Перегляд та перевірка договорів</td>
+                                <td class="px-6 py-4 text-left">134.00 UAH</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-center space-x-3">
+                                        <button class="text-neutral-600 hover:text-neutral-900">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        <button class="text-neutral-600 hover:text-neutral-900">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Real Agency{% endblock %}
+
+{% block content %}
+    <main id="main" class="pt-20">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between items-center mb-8">
+                    <h1 class="text-2xl">База даних клієнтів</h1>
+                    <button class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                        <i class="fa-solid fa-plus mr-2"></i>Додати клієнта
+                    </button>
+                </div>
+                <div id="clientTable" class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-neutral-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm text-neutral-600">ID</th>
+                                <th class="px-6 py-3 text-left text-sm text-neutral-600">Ім'я</th>
+                                <th class="px-6 py-3 text-left text-sm text-neutral-600">Тип</th>
+                                <th class="px-6 py-3 text-left text-sm text-neutral-600">Адреса</th>
+                                <th class="px-6 py-3 text-left text-sm text-neutral-600">Контакти</th>
+                                <th class="px-6 py-3 text-center text-sm text-neutral-600">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-100">
+                            <tr class="hover:bg-neutral-50">
+                                <td class="px-6 py-4 text-sm">#12345</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <span>Джон Сміт</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">Бізнес</td>
+                                <td class="px-6 py-4">123 Бізнес Авеню</td>
+                                <td class="px-6 py-4">
+                                    <div>john@email.com</div>
+                                    <div class="text-neutral-500">+1 234 567 890</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex space-x-2">
+                                        <button class="text-neutral-600 hover:text-neutral-900"><i
+                                                class="fa-solid fa-pen"></i></button>
+                                        <button class="text-neutral-600 hover:text-neutral-900"><i
+                                                class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-neutral-50">
+                                <td class="px-6 py-4 text-sm">#12346</td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center">
+                                        <span>Сара Джонсон</span>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">Індивідуальний</td>
+                                <td class="px-6 py-4">456 Домашня Вулиця</td>
+                                <td class="px-6 py-4">
+                                    <div>sarah@email.com</div>
+                                    <div class="text-neutral-500">+1 234 567 891</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex space-x-2">
+                                        <button class="text-neutral-600 hover:text-neutral-900"><i
+                                                class="fa-solid fa-pen"></i></button>
+                                        <button class="text-neutral-600 hover:text-neutral-900"><i
+                                                class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+{% endblock %}

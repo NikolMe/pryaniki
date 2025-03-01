@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Real Agency{% endblock %}
+
+{% block content %}
+    <main id="main" class="pt-24">
+        <div class="container mx-auto px-4">
+            <div id="page-header" class="mb-8">
+                <h1 class="text-3xl mb-2">Реєстр наданих послуг</h1>
+                <p class="text-neutral-600">Перегляд і керування записів транзакцій</p>
+            </div>
+            <div id="filters" class="bg-neutral-50 p-6 rounded-xl mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm text-neutral-600 mb-2">Ім'я клієнта</label>
+                        <input type="text" class="w-full px-3 py-2 border border-neutral-300 rounded-lg" placeholder="Пошук клієнта...">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-neutral-600 mb-2">Тип послуги</label>
+                        <select class="w-full px-3 py-2 border border-neutral-300 rounded-lg bg-white">
+                            <option>Всі</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-neutral-600 mb-2">Дата</label>
+                        <input type="date" class="w-full px-3 py-2 border border-neutral-300 rounded-lg">
+                    </div>
+                    <div class="flex items-end">
+                        <button class="w-full bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                            <i class="fa-solid fa-filter mr-2"></i>Застосувати
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="actions" class="flex justify-end mb-6">
+                <button class="px-4 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50">
+                    <i class="fa-solid fa-file-pdf mr-2"></i>Експорт в PDF
+                </button>
+            </div>
+            <div id="transactions-table" class="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-neutral-50 border-b border-neutral-200">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-sm text-neutral-600">ID</th>
+                            <th class="px-6 py-3 text-left text-sm text-neutral-600">Дата</th>
+                            <th class="px-6 py-3 text-left text-sm text-neutral-600">Клієнт</th>
+                            <th class="px-6 py-3 text-left text-sm text-neutral-600">Послуга</th>
+                            <th class="px-6 py-3 text-left text-sm text-neutral-600">Кількість</th>
+                            <th class="px-6 py-3 text-left text-sm text-neutral-600">Сума</th>
+                            <th class="px-6 py-3 text-center text-sm text-neutral-600">Дії</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-neutral-200">
+                        <tr class="hover:bg-neutral-50">
+                            <td class="px-6 py-4 text-sm">#12345</td>
+                            <td class="px-6 py-4 text-sm">15 січня 2025</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div>
+                                        <div class="text-sm">Джон Сміт</div>
+                                        <div class="text-xs text-neutral-500">ID: CS-001</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm">Аутентифікація документа</td>
+                            <td class="px-6 py-4 text-sm">1</td>
+                            <td class="px-6 py-4 text-sm">2134.00 UAH</td>
+                            <td class="px-6 py-4">
+                                <div class="flex justify-center space-x-3">
+                                    <button class="text-neutral-600 hover:text-neutral-900">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <button class="text-neutral-600 hover:text-neutral-900">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-neutral-50">
+                            <td class="px-6 py-4 text-sm">#12346</td>
+                            <td class="px-6 py-4 text-sm">16 січня 2025</td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <div>
+                                        <div class="text-sm">Сара Джонсон</div>
+                                        <div class="text-xs text-neutral-500">ID: CS-002</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm">Юридична сертифікація</td>
+                            <td class="px-6 py-4 text-sm">1</td>
+                            <td class="px-6 py-4 text-sm">1234.00 UAH</td>
+                            <td class="px-6 py-4">
+                                <div class="flex justify-center space-x-3">
+                                    <button class="text-neutral-600 hover:text-neutral-900">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <button class="text-neutral-600 hover:text-neutral-900">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+{% endblock %}
