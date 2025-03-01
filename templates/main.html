@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Real Agency{% endblock %}
+
+{% block content %}
+    <main id="main" class="pt-20">
+            <div class="container mx-auto px-4">
+                <section id="welcome" class="mb-12">
+                    <h1 class="text-3xl mb-4">Ласкаво просимо до Порталу працівників</h1>
+                    <p class="text-neutral-600">Доступ до всіх інструментів управління компанією з одного місця</p>
+                </section>
+                <section id="quick-actions" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
+                        <div class="flex items-center mb-4">
+                            <i class="fa-solid fa-users text-2xl text-neutral-700"></i>
+                            <h2 class="text-xl ml-3">База даних клієнтів</h2>
+                        </div>
+                        <p class="text-neutral-600 mb-4">Управління інформацією та записами клієнтів</p>
+                        <button class="w-full bg-neutral-900 text-white py-3 rounded-lg hover:bg-neutral-800">
+                            Доступ до бази даних
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
+                        <div class="flex items-center mb-4">
+                            <i class="fa-solid fa-gear text-2xl text-neutral-700"></i>
+                            <h2 class="text-xl ml-3">Управління послугами</h2>
+                        </div>
+                        <p class="text-neutral-600 mb-4">Налаштування та управління пропозиціями послуг</p>
+                        <button class="w-full bg-neutral-900 text-white py-3 rounded-lg hover:bg-neutral-800">
+                            Управління послугами
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
+                        <div class="flex items-center mb-4">
+                            <i class="fa-solid fa-book text-2xl text-neutral-700"></i>
+                            <h2 class="text-xl ml-3">Реєстр наданих послуг</h2>
+                        </div>
+                        <p class="text-neutral-600 mb-4">Перегляд та відстеження записів послуг</p>
+                        <button class="w-full bg-neutral-900 text-white py-3 rounded-lg hover:bg-neutral-800">
+                            Відкрити реєстр
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
+                        <div class="flex items-center mb-4">
+                            <i class="fa-solid fa-percent text-2xl text-neutral-700"></i>
+                            <h2 class="text-xl ml-3">Управління знижками</h2>
+                        </div>
+                        <p class="text-neutral-600 mb-4">Налаштування та контроль політики знижок</p>
+                        <button class="w-full bg-neutral-900 text-white py-3 rounded-lg hover:bg-neutral-800">
+                            Управління знижками
+                        </button>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-neutral-200">
+                        <div class="flex items-center mb-4">
+                            <i class="fa-solid fa-file-invoice-dollar text-2xl text-neutral-700"></i>
+                            <h2 class="text-xl ml-3">Рахуноки на оплату</h2>
+                        </div>
+                        <p class="text-neutral-600 mb-4">Створення та управління платіжними документами</p>
+                        <button class="w-full bg-neutral-900 text-white py-3 rounded-lg hover:bg-neutral-800">
+                            Створити рахунок
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+{% endblock %}
