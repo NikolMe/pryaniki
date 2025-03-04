@@ -50,23 +50,24 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-200">
+                    {% for payment in payments %}
                         <tr class="hover:bg-neutral-50">
-                            <td class="px-6 py-4 text-sm">#12345</td>
-                            <td class="px-6 py-4 text-sm">15 січня 2025</td>
+                            <td class="px-6 py-4 text-sm">#{{ payment.id }}</td>
+                            <td class="px-6 py-4 text-sm">{{ payment.date }}</td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     <div>
-                                        <div class="text-sm">Джон Сміт</div>
-                                        <div class="text-xs text-neutral-500">ID: CS-001</div>
+                                        <div class="text-sm">{{ payment.client.id }}</div>
+                                        <div class="text-xs text-neutral-500">ID: {{ payment.client.name }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <a href="path/to/document.pdf" class="text-blue-600 hover:underline" download>
-                                    <i class="fa-solid fa-file-pdf mr-2"></i>invoice2134.pdf
+                                    <i class="fa-solid fa-file-pdf mr-2"></i>{{ payment.invoice_file_path }}
                                 </a>
                             </td>
-                            <td class="px-6 py-4 text-sm">2134.00 UAH</td>
+                            <td class="px-6 py-4 text-sm">{{ payment.commission }} UAH</td>
                             <td class="px-6 py-4">
                                 <div class="flex justify-center space-x-3">
                                     <button class="text-neutral-600 hover:text-neutral-900">
@@ -78,34 +79,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr class="hover:bg-neutral-50">
-                            <td class="px-6 py-4 text-sm">#12346</td>
-                            <td class="px-6 py-4 text-sm">16 січня 2025</td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div>
-                                        <div class="text-sm">Сара Джонсон</div>
-                                        <div class="text-xs text-neutral-500">ID: CS-002</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm">
-                                <a href="path/to/document.pdf" class="text-blue-600 hover:underline" download>
-                                    <i class="fa-solid fa-file-pdf mr-2"></i>invoice1234.pdf
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 text-sm">1234.00 UAH</td>
-                            <td class="px-6 py-4">
-                                <div class="flex justify-center space-x-3">
-                                    <button class="text-neutral-600 hover:text-neutral-900">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>
-                                    <button class="text-neutral-600 hover:text-neutral-900">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>

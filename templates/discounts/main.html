@@ -10,49 +10,116 @@
                 <p class="text-neutral-600">Створення та керування знижками на послуги</p>
             </div>
             <div id="add-discount" class="flex justify-end mb-6">
-                <button class="bg-neutral-900 text-white px-6 py-3 rounded-lg hover:bg-neutral-800">
+                <button id="add-discount-btn" class="bg-neutral-900 text-white px-6 py-3 rounded-lg hover:bg-neutral-800">
                     <i class="fa-solid fa-plus mr-2"></i>Додати правило знижки
                 </button>
             </div>
             <div id="discount-rules" class="bg-neutral-50 p-6 rounded-xl border border-neutral-200 mb-12">
                 <h3 class="text-xl mb-4">Правила знижок</h3>
                 <div class="space-y-4">
+                    {% for discount in discounts %}
                     <div class="flex items-center justify-between p-4 bg-white rounded-lg">
                         <div class="flex items-center space-x-4">
                             <i class="fa-solid fa-check-circle text-neutral-800"></i>
                             <div>
-                                <h4>Перший клієнт</h4>
-                                <p class="text-sm text-neutral-600">Знижка 10% на перше обслуговування</p>
+                                <h4>{{ discount.name }}</h4>
+                                <p class="text-sm text-neutral-600">{{ discount.description }}</p>
                             </div>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button class="text-neutral-600 hover:text-neutral-800">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="text-neutral-600 hover:text-neutral-800">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            <button class="edit-discount text-neutral-600 hover:text-neutral-800"
+                                data-id="{{ discount.id }}"
+                                data-name="{{ discount.name }}"
+                                data-rate="{{ discount.rate }}"
+                                data-description="{{ discount.description }}">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="delete-discount text-neutral-600 hover:text-neutral-800"
+                                data-id="{{ discount.id }}">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between p-4 bg-white rounded-lg">
-                        <div class="flex items-center space-x-4">
-                            <i class="fa-solid fa-check-circle text-neutral-800"></i>
-                            <div>
-                                <h4>Комплектна знижка</h4>
-                                <p class="text-sm text-neutral-600">Знижка 15% при бронюванні 3+ послуг</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="text-neutral-600 hover:text-neutral-800">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button class="text-neutral-600 hover:text-neutral-800">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </main>
+
+    {% include "discounts/modal_discount.html" %}
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('discount-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const form = document.getElementById('discount-form');
+
+    const discountIdInput = document.getElementById('discount-id');
+    const discountNameInput = document.getElementById('discount-name');
+    const discountRateInput = document.getElementById('discount-rate');
+    const discountDescriptionInput = document.getElementById('discount-description');
+
+    const openModal = () => modal.classList.remove('hidden');
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        form.reset();
+        discountIdInput.value = '';
+    };
+
+    document.getElementById('add-discount-btn').addEventListener('click', () => {
+        modalTitle.textContent = 'Створення знижки';
+        openModal();
+    });
+
+    document.querySelectorAll('.edit-discount').forEach(button => {
+        button.addEventListener('click', () => {
+            modalTitle.textContent = 'Редагування знижки';
+            discountIdInput.value = button.dataset.id;
+            discountNameInput.value = button.dataset.name;
+            discountRateInput.value = button.dataset.rate;
+            discountDescriptionInput.value = button.dataset.description;
+            openModal();
+        });
+    });
+
+    document.querySelectorAll('.delete-discount').forEach(button => {
+        button.addEventListener('click', () => {
+            if (confirm('Ви впевнені, що хочете видалити цю знижку?')) {
+                const discountId = button.dataset.id;
+                fetch(`/delete_discount/${discountId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(() => location.reload())
+                .catch(error => console.error('Помилка видалення:', error));
+            }
+        });
+    });
+
+    document.getElementById('close-modal').addEventListener('click', closeModal);
+    document.getElementById('cancel-modal').addEventListener('click', closeModal);
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const url = discountIdInput.value
+            ? `/edit_discount/${discountIdInput.value}/`
+            : `{% url 'add_discount' %}`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(() => {
+            closeModal();
+            location.reload();
+        })
+        .catch(error => console.error('Помилка збереження:', error));
+    });
+});
+    </script>
 {% endblock %}

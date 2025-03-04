@@ -1,0 +1,40 @@
+<div id="discount-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="modal-title" class="text-2xl">Створення знижки</h2>
+            <button id="close-modal" class="text-neutral-500 hover:text-neutral-700">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <form id="discount-form" class="space-y-4">
+            <input type="hidden" id="discount-id" name="discount_id">
+            <div class="space-y-2">
+                <label class="block text-sm text-neutral-700">Назва знижки</label>
+                <input type="text" id="discount-name" name="name"
+                    class="w-full px-3 py-2 border border-neutral-300 rounded-lg"
+                    placeholder="Введіть назву знижки" maxlength="255">
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm text-neutral-700">Відсоток знижки</label>
+                <input type="number" id="discount-rate" name="rate"
+                    class="w-full px-3 py-2 border border-neutral-300 rounded-lg"
+                    placeholder="Введіть відсоток знижки" min="0" max="100">
+            </div>
+            <div class="space-y-2">
+                <label class="block text-sm text-neutral-700">Опис знижки</label>
+                <textarea id="discount-description" name="description"
+                    class="w-full px-3 py-2 border border-neutral-300 rounded-lg resize-none"
+                    placeholder="Введіть опис знижки" rows="4" maxlength="255"></textarea>
+            </div>
+            <div class="flex justify-end space-x-4 pt-4">
+                <button type="button" id="cancel-modal"
+                    class="px-4 py-2 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50">
+                    Скасувати
+                </button>
+                <button type="submit" class="px-4 py-2 bg-neutral-900 text-white rounded-lg hover:bg-neutral-800">
+                    Зберегти
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

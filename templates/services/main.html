@@ -18,7 +18,7 @@
                         <option>Ціна від високої до низької</option>
                     </select>
                     <div class="col-span-2 flex justify-end">
-                        <button class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                        <button id="add-service" class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
                             <i class="fa-solid fa-plus mr-2"></i>Додати нову послугу
                         </button>
                     </div>
@@ -35,57 +35,113 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-200">
-                            <tr class="hover:bg-neutral-50">
-                                <td class="px-6 py-4 text-sm">#12345</td>
-                                <td class="px-6 py-4">Автентифікація документів</td>
-                                <td class="px-6 py-4">Професійні послуги автентифікації</td>
-                                <td class="px-6 py-4 text-left">234.00 UAH</td>
+                            {% for service in services %}
+                                <tr class="hover:bg-neutral-50">
+                                <td class="px-6 py-4 text-sm"># {{ service.id }}</td>
+                                <td class="px-6 py-4">{{ service.name }}</td>
+                                <td class="px-6 py-4">{{ service.description }}</td>
+                                <td class="px-6 py-4 text-left">{{ service.price }} UAH</td>
                                 <td class="px-6 py-4">
                                     <div class="flex justify-center space-x-3">
-                                        <button class="text-neutral-600 hover:text-neutral-900">
+                                        <button class="edit-service text-neutral-600 hover:text-neutral-900"
+                                                data-id="{{ service.id }}"
+                                                data-name="{{ service.name }}"
+                                                data-description="{{ service.description }}"
+                                                data-price="{{ service.price }}">
                                             <i class="fa-solid fa-pen-to-square"></i>
                                         </button>
-                                        <button class="text-neutral-600 hover:text-neutral-900">
+                                        <button class="delete-service text-neutral-600 hover:text-neutral-900"
+                                                data-id="{{ service.id }}">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </div>
                                 </td>
-                            </tr>
-                            <tr class="hover:bg-neutral-50">
-                                <td class="px-6 py-4 text-sm">#12346</td>
-                                <td class="px-6 py-4">Юридична сертифікація</td>
-                                <td class="px-6 py-4">Офіційна сертифікація документів</td>
-                                <td class="px-6 py-4 text-left">214.00 UAH</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex justify-center space-x-3">
-                                        <button class="text-neutral-600 hover:text-neutral-900">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </button>
-                                        <button class="text-neutral-600 hover:text-neutral-900">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-neutral-50">
-                                <td class="px-6 py-4 text-sm">#12347</td>
-                                <td class="px-6 py-4">Перевірка договорів</td>
-                                <td class="px-6 py-4">Перегляд та перевірка договорів</td>
-                                <td class="px-6 py-4 text-left">134.00 UAH</td>
-                                <td class="px-6 py-4">
-                                    <div class="flex justify-center space-x-3">
-                                        <button class="text-neutral-600 hover:text-neutral-900">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </button>
-                                        <button class="text-neutral-600 hover:text-neutral-900">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
         </main>
+
+        {% include "services/modal_service.html" %}
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('modal-overlay');
+    const modalTitle = document.querySelector('#service-modal h2');
+    const form = document.getElementById('service-form');
+
+    const serviceIdInput = document.getElementById('service-id');
+    const serviceNameInput = document.getElementById('service-name');
+    const serviceDescriptionInput = document.getElementById('service-description');
+    const servicePriceInput = document.getElementById('service-price');
+
+    const openModal = () => modal.classList.remove('hidden');
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        form.reset();
+        serviceIdInput.value = '';
+    };
+
+    document.getElementById('add-service').addEventListener('click', () => {
+        modalTitle.textContent = 'Додати Нову Послугу';
+        openModal();
+    });
+
+    document.querySelectorAll('.edit-service').forEach(button => {
+        button.addEventListener('click', () => {
+            modalTitle.textContent = 'Редагувати Послугу';
+            serviceIdInput.value = button.dataset.id;
+            serviceNameInput.value = button.dataset.name;
+            serviceDescriptionInput.value = button.dataset.description;
+            servicePriceInput.value = button.dataset.price;
+            openModal();
+        });
+    });
+
+    document.querySelectorAll('.delete-service').forEach(button => {
+        button.addEventListener('click', () => {
+            if (confirm('Ви впевнені, що хочете видалити цю послугу?')) {
+                const serviceId = button.dataset.id;
+                fetch(`/delete_service/${serviceId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(() => location.reload())
+                .catch(error => console.error('Помилка видалення:', error));
+            }
+        });
+    });
+
+    document.querySelector('#service-modal button.text-neutral-500').addEventListener('click', closeModal);
+    document.querySelector('#service-modal button.border').addEventListener('click', closeModal);
+
+    document.querySelector('#service-modal button.bg-neutral-900').addEventListener('click', (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('name', serviceNameInput.value);
+        formData.append('description', serviceDescriptionInput.value);
+        formData.append('price', servicePriceInput.value);
+
+        const url = serviceIdInput.value
+            ? `/edit_service/${serviceIdInput.value}/`
+            : `{% url 'add_service' %}`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(() => {
+            closeModal();
+            location.reload();
+        })
+        .catch(error => console.error('Помилка збереження:', error));
+    });
+});
+</script>
 {% endblock %}
