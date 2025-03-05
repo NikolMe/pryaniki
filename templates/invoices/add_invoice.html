@@ -4,96 +4,104 @@
 
 {% block content %}
 <main id="main" class="pt-24">
-            <div class="container mx-auto px-4">
-                <div id="breadcrumbs" class="mb-8">
-                    <div class="flex items-center space-x-2 text-sm text-neutral-600">
-                        <span>Рахунки на оплату</span>
-                        <i class="fa-solid fa-chevron-right"></i>
-                        <span>Новий рахунок</span>
+    <div class="container mx-auto px-4">
+        <div id="breadcrumbs" class="mb-8">
+            <div class="flex items-center space-x-2 text-sm text-neutral-600">
+                <span>Рахунки на оплату</span>
+                <i class="fa-solid fa-chevron-right"></i>
+                <span>Новий рахунок</span>
+            </div>
+        </div>
+        <div id="service-form" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <!-- Client Search Section -->
+                <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
+                    <h2 class="text-2xl mb-6">Оберіть клієнта</h2>
+                    <div class="flex space-x-2 relative">
+                        <input type="text" id="client-search" placeholder="Пошук клієнта..."
+                            class="flex-1 border rounded-lg px-4 py-2">
+                        <div id="add-client" class="flex justify-end">
+                                    <button class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                                        <i class="fa-solid fa-plus mr-2"></i>Додати нового клієнта
+                                    </button>
+                                </div>
+                        <div id="client-search-results"
+                            class="absolute top-full left-0 w-full bg-white border rounded-lg mt-1 shadow-lg z-10 hidden">
+                        </div>
+                    </div>
+                    <!-- Client info section, initially hidden -->
+                    <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50 hidden" id="selected-client-info">
+                        <div class="flex items-start space-x-4">
+                            <div>
+                                <h3 id="client-name" class="text-lg">Користувач</h3>
+                                <p id="client-iin" class="text-neutral-600">Ідентифікаційний код: 38023801232</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
+                    <h2 class="text-2xl mb-6">Оберіть послуги</h2>
+                    <div class="flex space-x-2 relative">
+                        <input type="text" id="service-search" placeholder="Пошук послуги..."
+                            class="flex-1 border rounded-lg px-4 py-2">
+                        <div id="search-results"
+                            class="absolute top-full left-0 w-full bg-white border rounded-lg mt-1 shadow-lg z-10 hidden">
+                        </div>
+                    </div>
+                    <div id="selected-services" class="space-y-4 mt-4">
                     </div>
                 </div>
-                <div id="service-form" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2">
-                        <!-- Client Search Section -->
-                            <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
-                                <h2 class="text-2xl mb-6">Оберіть клієнта</h2>
-                                <div class="flex space-x-2 relative">
-                                    <input type="text" id="client-search" placeholder="Пошук клієнта..."
-                                        class="flex-1 border rounded-lg px-4 py-2">
-                                    <div id="client-search-results"
-                                        class="absolute top-full left-0 w-full bg-white border rounded-lg mt-1 shadow-lg z-10 hidden">
-                                    </div>
-                                </div>
 
-                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50">
-                                    <div class="flex items-start space-x-4">
-                                        <div>
-                                            <h3 id="client-name" class="text-lg">Користувач</h3>
-                                            <p id="client-iin" class="text-neutral-600">Ідентифікаційний код: 38023801232</p>
-                                        </div>
-                                    </div>
+                <div class="bg-white rounded-xl border border-neutral-200 p-6">
+                    <h2 class="text-2xl mb-6">Оберіть знижки</h2>
+                    <div class="space-y-4">
+                        {% for discount in discounts %}
+                        <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50">
+                            <div class="flex items-start space-x-4">
+                                <input type="checkbox" class="discount-checkbox mt-1" data-rate="{{ discount.rate }}" />
+                                <div>
+                                    <h3 class="text-lg">{{ discount.name }}</h3>
+                                    <p class="text-neutral-600">{{ discount.description }}</p>
                                 </div>
                             </div>
-                        <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
-                            <h2 class="text-2xl mb-6">Оберіть послуги</h2>
-                            <div class="flex space-x-2 relative">
-                                <input type="text" id="service-search" placeholder="Пошук послуги..."
-                                    class="flex-1 border rounded-lg px-4 py-2">
-                                <div id="search-results"
-                                    class="absolute top-full left-0 w-full bg-white border rounded-lg mt-1 shadow-lg z-10 hidden">
-                                </div>
-                            </div>
-                            <div id="selected-services" class="space-y-4 mt-4">
-                            </div>
+                            <span class="text-lg">{{ discount.rate }}%</span>
                         </div>
-                        <div class="bg-white rounded-xl border border-neutral-200 p-6">
-                            <h2 class="text-2xl mb-6">Оберіть знижки</h2>
-                            <div class="space-y-4">
-                                {% for discount in discounts %}
-                                <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50">
-                                    <div class="flex items-start space-x-4">
-                                        <input type="checkbox" class="discount-checkbox mt-1" data-rate="{{ discount.rate }}" />
-                                        <div>
-                                            <h3 class="text-lg">{{ discount.name }}</h3>
-                                            <p class="text-neutral-600">{{ discount.description }}</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-lg">{{ discount.rate }}%</span>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    <div id="summary" class="lg:col-span-1">
-                        <div class="bg-white rounded-xl border border-neutral-200 p-6 sticky top-24">
-                            <h2 class="text-2xl mb-6">Підсумок</h2>
-                                <div class="space-y-4 mb-6">
-                                    <div class="flex justify-between">
-                                        <span class="text-neutral-600">Обрані послуги</span>
-                                        <span id="selected-services-sum">{{ servicesTotal }} UAH</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-neutral-600">Знижки</span>
-                                        <span id="discounts-sum">0.00 UAH</span>
-                                    </div>
-                                    <div class="border-t pt-4">
-                                        <div class="flex justify-between">
-                                            <span>Підсумок</span>
-                                            <span id="total-sum">0.00 UAH</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            <button class="w-full bg-neutral-900 text-white py-3 rounded-lg hover:bg-neutral-800 mb-4">
-                                <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Створити рахунок
-                            </button>
-                            <button class="w-full border border-neutral-300 py-3 rounded-lg hover:bg-neutral-50">
-                                <i class="fa-solid fa-print mr-2"></i>Попередній перегляд
-                            </button>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-        </main>
+
+            <div id="summary" class="lg:col-span-1">
+                <div class="bg-white rounded-xl border border-neutral-200 p-6 sticky top-24">
+                    <h2 class="text-2xl mb-6">Підсумок</h2>
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between">
+                            <span class="text-neutral-600">Обрані послуги</span>
+                            <span id="selected-services-sum">{{ servicesTotal }} UAH</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-neutral-600">Знижки</span>
+                            <span id="discounts-sum">0.00 UAH</span>
+                        </div>
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between">
+                                <span>Підсумок</span>
+                                <span id="total-sum">0.00 UAH</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="w-full bg-neutral-900 text-white py-3 rounded-lg hover:bg-neutral-800 mb-4">
+                        <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Створити рахунок
+                    </button>
+                    <button class="w-full border border-neutral-300 py-3 rounded-lg hover:bg-neutral-50">
+                        <i class="fa-solid fa-print mr-2"></i>Попередній перегляд
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -156,7 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="text-lg">${service.price} UAH</span>
         `;
 
-        // Listen for checkbox changes to trigger the total update
         wrapper.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
             updateTotals();
             if (!e.target.checked) {
@@ -165,8 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         selectedServices.appendChild(wrapper);
-
-        // Manually update totals after adding a new service
         updateTotals();
     }
 
@@ -196,14 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
     }
 
-    // Update totals when services or discounts change
     document.addEventListener('change', (event) => {
         if (event.target.classList.contains('service-checkbox') || event.target.classList.contains('discount-checkbox')) {
             updateTotals();
         }
     });
 
-    // Call on page load to make sure everything is initialized
     updateTotals();
 });
 
@@ -212,6 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clientSearchResults = document.getElementById('client-search-results');
     const clientNameDisplay = document.getElementById('client-name');
     const clientIinDisplay = document.getElementById('client-iin');
+    const selectedClientInfo = document.getElementById('selected-client-info');  // New reference to the info div
 
     let clientDebounceTimeout;
 
@@ -251,9 +255,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function selectClient(client) {
-        // Replace the displayed client data with the selected client info
         clientNameDisplay.textContent = client.name;
         clientIinDisplay.textContent = `Ідентифікаційний код: ${client.iin}`;
+
+        // Show the client info section
+        selectedClientInfo.classList.remove('hidden');
     }
 });
 </script>
