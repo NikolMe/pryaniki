@@ -66,12 +66,28 @@ def payments(request):
     payments_list = Invoice.objects.all().order_by('id')
     user_groups = request.user.groups.values_list('name', flat=True)
 
-    return render(request, 'invoices/main.html', {'invoices': payments_list, 'user_groups': user_groups })
+    # Pagination: 15 items per page
+    paginator = Paginator(payments_list, 15)
+
+    # Get the current page number from the request
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'invoices/main.html', {'invoices': page_obj, 'user_groups': user_groups})
+
 
 @role_required(['Manager', 'Notary'])
 def provided_services(request):
     provided_services_list = ProvidedService.objects.all().order_by('id')
-    return render(request, 'provided_services/main.html', { 'provided_services': provided_services_list })
+
+    # Pagination: 15 items per page
+    paginator = Paginator(provided_services_list, 15)
+
+    # Get the current page number from the request
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'provided_services/main.html', {'provided_services': page_obj})
 
 @role_required(['Manager', 'Notary'])
 def services(request):

@@ -10,32 +10,10 @@
                 <p class="text-neutral-600">Перегляд і керування записів транзакцій</p>
             </div>
             <div id="filters" class="bg-neutral-50 p-6 rounded-xl mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm text-neutral-600 mb-2">Ім'я клієнта</label>
-                        <input type="text" class="w-full px-3 py-2 border border-neutral-300 rounded-lg" placeholder="Пошук клієнта...">
-                    </div>
-                    <div>
-                        <label class="block text-sm text-neutral-600 mb-2">Тип послуги</label>
-                        <select class="w-full px-3 py-2 border border-neutral-300 rounded-lg bg-white">
-                            <option>Всі</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-neutral-600 mb-2">Дата</label>
-                        <input type="date" class="w-full px-3 py-2 border border-neutral-300 rounded-lg">
-                    </div>
-                    <div class="flex items-end">
-                        <button class="w-full bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
-                            <i class="fa-solid fa-filter mr-2"></i>Застосувати
-                        </button>
-                    </div>
-                </div>
+                <!-- Filters section -->
             </div>
             <div id="actions" class="flex justify-end mb-6">
-                <button class="px-4 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50">
-                    <i class="fa-solid fa-file-pdf mr-2"></i>Експорт в PDF
-                </button>
+                <!-- Actions section -->
             </div>
             <div id="transactions-table" class="bg-white rounded-xl border border-neutral-200 overflow-hidden">
                 <table class="w-full">
@@ -64,9 +42,26 @@
                             <td class="px-6 py-4 text-sm">{{ provided_service.service.name }}</td>
                             <td class="px-6 py-4 text-sm">{{ provided_service.price }} UAH</td>
                         </tr>
-                    {% endfor %}
+                        {% endfor %}
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination controls -->
+            <div class="flex justify-center mt-8">
+                <div class="pagination">
+                    {% if provided_services.has_previous %}
+                        <a href="?page=1" class="px-3 py-2 border">Перша</a>
+                        <a href="?page={{ provided_services.previous_page_number }}" class="px-3 py-2 border">Попередня</a>
+                    {% endif %}
+
+                    <span class="px-3 py-2 border">{{ provided_services.number }} / {{ provided_services.paginator.num_pages }}</span>
+
+                    {% if provided_services.has_next %}
+                        <a href="?page={{ provided_services.next_page_number }}" class="px-3 py-2 border">Наступна</a>
+                        <a href="?page={{ provided_services.paginator.num_pages }}" class="px-3 py-2 border">Остання</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </main>
