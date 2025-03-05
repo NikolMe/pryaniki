@@ -72,6 +72,7 @@
     document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
     const sortSelect = document.getElementById('sort-select');
+    let debounceTimer;
 
     const performSearch = () => {
         const search = searchInput.value.trim();
@@ -85,9 +86,12 @@
     };
 
     searchInput.addEventListener('input', () => {
-        if (searchInput.value.length >= 2 || searchInput.value.length === 0) {
-            setTimeout(performSearch, 500); // Debounce effect
-        }
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            if (searchInput.value.length >= 2 || searchInput.value.length === 0) {
+                performSearch();
+            }
+        }, 500); // Delay of 500ms
     });
 
     sortSelect.addEventListener('change', performSearch);

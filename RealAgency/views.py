@@ -25,7 +25,7 @@ def discounts(request):
 
 def payments(request):
     payments_list = Invoice.objects.all().order_by('id')
-    return render(request, 'payments/main.html', { 'payments': payments_list })
+    return render(request, 'invoices/main.html', {'invoices': payments_list})
 
 def provided_services(request):
     provided_services_list = ProvidedService.objects.all().order_by('id')
@@ -308,3 +308,14 @@ def delete_service(request, service_id):
         service.delete()
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
+
+def add_invoice(request):
+    discount_list = Discount.objects.all().order_by('id')
+    return render(request, 'invoices/add_invoice.html', {'discounts': discount_list})
+
+def search_services(request):
+    query = request.GET.get('q', '').strip()
+    services = []
+    if len(query) >= 2:
+        services = list(Service.objects.filter(name__icontains=query).values('id', 'name', 'description', 'price')[:5])
+    return JsonResponse(services, safe=False)

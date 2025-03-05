@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Real Agency{% endblock %}
+
+{% block content %}
+<main id="main" class="pt-24">
+            <div class="container mx-auto px-4">
+                <div id="breadcrumbs" class="mb-8">
+                    <div class="flex items-center space-x-2 text-sm text-neutral-600">
+                        <span>Рахунки на оплату</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                        <span>Новий рахунок</span>
+                    </div>
+                </div>
+                <div id="service-form" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
+                            <h2 class="text-2xl mb-6">Оберіть клієнта</h2>
+                            <div class="flex space-x-2">
+                                <input type="text" id="client-search" placeholder="Пошук клієнта..."
+                                        class="flex-1 border rounded-lg px-4 py-2">
+
+                                <div id="add-client" class="flex justify-end">
+                                    <button class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                                        <i class="fa-solid fa-plus mr-2"></i>Додати нового клієнта
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
+                            <h2 class="text-2xl mb-6">Оберіть послуги</h2>
+                            <div class="flex space-x-2 relative">
+                                <input type="text" id="service-search" placeholder="Пошук послуги..."
+                                    class="flex-1 border rounded-lg px-4 py-2">
+                                <div id="search-results"
+                                    class="absolute top-full left-0 w-full bg-white border rounded-lg mt-1 shadow-lg z-10 hidden">
+                                </div>
+                            </div>
+                            <div id="selected-services" class="space-y-4 mt-4">
+                                <!-- Selected services will appear here -->
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl border border-neutral-200 p-6">
+                            <h2 class="text-2xl mb-6">Оберіть знижки</h2>
+                            <div class="space-y-4">
+                                {% for discount in discounts %}
+                                <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50">
+                                    <div class="flex items-start space-x-4">
+                                        <input type="checkbox" class="discount-checkbox mt-1" data-rate="{{ discount.rate }}" />
+                                        <div>
+                                            <h3 class="text-lg">{{ discount.name }}</h3>
+                                            <p class="text-neutral-600">{{ discount.description }}</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-lg">{{ discount.rate }}%</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div id="summary" class="lg:col-span-1">
+                        <div class="bg-white rounded-xl border border-neutral-200 p-6 sticky top-24">
+                            <h2 class="text-2xl mb-6">Підсумок</h2>
+                                <div class="space-y-4 mb-6">
+                                    <div class="flex justify-between">
+                                        <span class="text-neutral-600">Обрані послуги</span>
+                                        <span id="selected-services-sum">{{ servicesTotal }} UAH</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-neutral-600">Знижки</span>
+                                        <span id="discounts-sum">0.00 UAH</span>
+                                    </div>
+                                    <div class="border-t pt-4">
+                                        <div class="flex justify-between">
+                                            <span>Підсумок</span>
+                                            <span id="total-sum">0.00 UAH</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            <button class="w-full bg-neutral-900 text-white py-3 rounded-lg hover:bg-neutral-800 mb-4">
+                                <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Створити рахунок
+                            </button>
+                            <button class="w-full border border-neutral-300 py-3 rounded-lg hover:bg-neutral-50">
+                                <i class="fa-solid fa-print mr-2"></i>Попередній перегляд
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('service-search');
+    const resultsContainer = document.getElementById('search-results');
+    const selectedServices = document.getElementById('selected-services');
+
+    let debounceTimeout;
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+
+        clearTimeout(debounceTimeout);
+
+        if (query.length >= 2) {
+            debounceTimeout = setTimeout(() => {
+                fetch(`/search_services/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(services => {
+                        resultsContainer.innerHTML = '';
+                        if (services.length > 0) {
+                            services.forEach(service => {
+                                const item = document.createElement('div');
+                                item.className = 'px-4 py-2 hover:bg-neutral-100 cursor-pointer';
+                                item.textContent = `${service.name} - ${service.price} UAH`;
+                                item.addEventListener('click', () => {
+                                    addService(service);
+                                    resultsContainer.classList.add('hidden');
+                                    searchInput.value = '';
+                                });
+                                resultsContainer.appendChild(item);
+                            });
+                            resultsContainer.classList.remove('hidden');
+                        } else {
+                            resultsContainer.innerHTML = '<div class="px-4 py-2 text-neutral-500">Нічого не знайдено</div>';
+                            resultsContainer.classList.remove('hidden');
+                        }
+                    });
+            }, 500);
+        } else {
+            resultsContainer.classList.add('hidden');
+        }
+    });
+
+    function addService(service) {
+        if (document.getElementById(`selected-service-${service.id}`)) return;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50';
+        wrapper.id = `selected-service-${service.id}`;
+
+        wrapper.innerHTML = `
+            <div class="flex items-start space-x-4">
+                <input type="checkbox" class="mt-1" checked>
+                <div>
+                    <h3 class="text-lg">${service.name}</h3>
+                    <p class="text-neutral-600">${service.description}</p>
+                </div>
+            </div>
+            <span class="text-lg">${service.price} UAH</span>
+        `;
+
+        wrapper.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+            if (!e.target.checked) {
+                wrapper.remove();
+            }
+        });
+
+        selectedServices.appendChild(wrapper);
+    }
+
+    function updateTotals() {
+    const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
+    const discountCheckboxes = document.querySelectorAll('.discount-checkbox');
+
+    let servicesTotal = 0;
+    serviceCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            servicesTotal += parseFloat(checkbox.dataset.price);
+        }
+    });
+
+    let totalDiscountRate = 0;
+    discountCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            totalDiscountRate += parseFloat(checkbox.dataset.rate);
+        }
+    });
+
+    const discountValue = servicesTotal * (totalDiscountRate / 100);
+    const finalTotal = servicesTotal - discountValue;
+
+    document.getElementById('selected-services-sum').textContent = servicesTotal.toFixed(2) + ' UAH';
+    document.getElementById('discounts-sum').textContent = discountValue.toFixed(2) + ' UAH';
+    document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
+}
+
+// Update totals when services or discounts change
+document.addEventListener('change', (event) => {
+    if (event.target.classList.contains('service-checkbox') || event.target.classList.contains('discount-checkbox')) {
+        updateTotals();
+    }
+});
+
+// Call on page load to make sure everything is initialized
+updateTotals();
+
+});
+    </script>
+{% endblock %}

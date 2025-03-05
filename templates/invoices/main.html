@@ -33,7 +33,7 @@
                 </div>
             </div>
             <div id="add-invoice" class="flex justify-end mb-6">
-                <button class="bg-neutral-900 text-white px-6 py-3 rounded-lg hover:bg-neutral-800">
+                <button id="add-invoice-btn" class="bg-neutral-900 text-white px-6 py-3 rounded-lg hover:bg-neutral-800">
                     <i class="fa-solid fa-plus mr-2"></i>Додати рахунок
                 </button>
             </div>
@@ -85,4 +85,9 @@
             </div>
         </div>
     </main>
+    <script>
+    document.getElementById('add-invoice-btn').addEventListener('click', () => {
+        window.location.href = '/add_invoice/';
+    });
+    </script>
 {% endblock %}
