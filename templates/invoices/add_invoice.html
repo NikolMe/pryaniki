@@ -33,8 +33,8 @@
                     <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50 hidden" id="selected-client-info">
                         <div class="flex items-start space-x-4">
                             <div>
-                                <h3 id="client-name" class="text-lg">Користувач</h3>
-                                <p id="client-iin" class="text-neutral-600">Ідентифікаційний код: 38023801232</p>
+                                <h3 id="client-name" class="text-lg"></h3>
+                                <p id="client-iin" class="text-neutral-600"></p>
                             </div>
                         </div>
                     </div>
@@ -59,7 +59,7 @@
                         {% for discount in discounts %}
                         <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50">
                             <div class="flex items-start space-x-4">
-                                <input type="checkbox" class="discount-checkbox mt-1" data-rate="{{ discount.rate }}" />
+                                <input type="checkbox" class="discount-checkbox mt-1" data-rate="{{ discount.rate }}" data-discount-id="{{ discount.id }}" />
                                 <div>
                                     <h3 class="text-lg">{{ discount.name }}</h3>
                                     <p class="text-neutral-600">{{ discount.description }}</p>
@@ -203,30 +203,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update totals (services and discounts)
     function updateTotals() {
-        const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
-        const discountCheckboxes = document.querySelectorAll('.discount-checkbox');
+    const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
+    const discountCheckboxes = document.querySelectorAll('.discount-checkbox');
 
-        let servicesTotal = 0;
-        serviceCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                servicesTotal += parseFloat(checkbox.dataset.price);
-            }
-        });
+    let servicesTotal = 0;
+    serviceCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            servicesTotal += parseFloat(checkbox.dataset.price);
+        }
+    });
 
-        let totalDiscountRate = 0;
-        discountCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                totalDiscountRate += parseFloat(checkbox.dataset.rate);
-            }
-        });
+    let totalDiscountRate = 0;
+    discountCheckboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            totalDiscountRate += parseFloat(checkbox.dataset.rate);
+        }
+    });
 
-        const discountValue = servicesTotal * (totalDiscountRate / 100);
-        const finalTotal = servicesTotal - discountValue;
+    const discountValue = servicesTotal * (totalDiscountRate / 100);
+    const finalTotal = servicesTotal - discountValue;
 
-        document.getElementById('selected-services-sum').textContent = servicesTotal.toFixed(2) + ' UAH';
-        document.getElementById('discounts-sum').textContent = discountValue.toFixed(2) + ' UAH';
-        document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
+    document.getElementById('selected-services-sum').textContent = servicesTotal.toFixed(2) + ' UAH';
+    document.getElementById('discounts-sum').textContent = discountValue.toFixed(2) + ' UAH';
+    document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
+
+    // Get the buttons
+    const createInvoiceButton = document.querySelector('button.w-full.bg-neutral-900');
+    const previewButton = document.querySelector('button.w-full.border');
+
+    // Check if servicesTotal is greater than 0 and show/hide buttons
+    if (servicesTotal > 0) {
+        createInvoiceButton.style.display = 'block';
+        previewButton.style.display = 'block';
+    } else {
+        createInvoiceButton.style.display = 'none';
+        previewButton.style.display = 'none';
     }
+}
 
     // Event listener for checkboxes change (service or discount)
     document.addEventListener('change', (event) => {
