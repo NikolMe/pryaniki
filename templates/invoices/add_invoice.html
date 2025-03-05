@@ -59,7 +59,7 @@
                         {% for discount in discounts %}
                         <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50">
                             <div class="flex items-start space-x-4">
-                                <input type="checkbox" class="discount-checkbox mt-1" data-rate="{{ discount.rate }}" data-discount-id="{{ discount.id }}" />
+                                <input type="checkbox" class="discount-checkbox mt-1" data-rate="{{ discount.rate }}" data-id="{{ discount.id }}" />
                                 <div>
                                     <h3 class="text-lg">{{ discount.name }}</h3>
                                     <p class="text-neutral-600">{{ discount.description }}</p>
@@ -112,6 +112,7 @@
 </main>
 
 <script>
+    let selectedClientId = null;
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('service-search');
     const resultsContainer = document.getElementById('search-results');
@@ -174,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to add selected service
     function addService(service) {
+        console.log(service);
         if (document.getElementById(`selected-service-${service.id}`)) return;
 
         const wrapper = document.createElement('div');
@@ -182,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         wrapper.innerHTML = `
             <div class="flex items-start space-x-4">
-                <input type="checkbox" class="service-checkbox mt-1" checked data-price="${service.price}">
+                <input type="checkbox" class="service-checkbox mt-1" checked data-price="${service.price}" data-id="${service.id}">
                 <div>
                     <h3 class="text-lg">${service.name}</h3>
                     <p class="text-neutral-600">${service.description}</p>
@@ -204,6 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to select client
     function selectClient(client) {
+        console.log(client);
+        selectedClientId = client.id; // Store the selected client ID
         clientNameDisplay.textContent = client.name;
         clientIinDisplay.textContent = `Ідентифікаційний код: ${client.iin}`;
         selectedClientInfo.classList.remove('hidden');
@@ -218,17 +222,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let servicesTotal = 0;
     let selectedServicesCount = 0;
+    let selectedServiceIds = [];
     serviceCheckboxes.forEach(checkbox => {
         if (checkbox.checked) {
             servicesTotal += parseFloat(checkbox.dataset.price);
             selectedServicesCount++;
+            selectedServiceIds.push(checkbox.dataset.id);
         }
     });
 
     let totalDiscountRate = 0;
+    let selectedDiscountIds = [];
     discountCheckboxes.forEach(checkbox => {
         if (checkbox.checked) {
             totalDiscountRate += parseFloat(checkbox.dataset.rate);
+                        console.log(checkbox.dataset.id);
+            selectedDiscountIds.push(checkbox.dataset.id);
         }
     });
 
@@ -238,6 +247,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('selected-services-sum').textContent = servicesTotal.toFixed(2) + ' UAH';
     document.getElementById('discounts-sum').textContent = discountValue.toFixed(2) + ' UAH';
     document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
+
+    window.selectedServiceIds = selectedServiceIds;
+    window.selectedDiscountIds = selectedDiscountIds;
 
     // Get the buttons and message containers
     const createInvoiceButton = document.querySelector('button.w-full.bg-neutral-900');
@@ -282,6 +294,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateTotals();
 });
+
+document.querySelector('button.w-full.bg-neutral-900').addEventListener('click', () => {
+    // Check if both client and services are selected
+    if (selectedClientId && window.selectedServiceIds.length > 0) {
+        // Prepare data for the request
+        const data = {
+            client_id: selectedClientId,
+            service_ids: window.selectedServiceIds,
+            discount_ids: window.selectedDiscountIds,
+        };
+
+        // Send a POST request to add_invoice view
+        fetch('/create_invoice/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'), // CSRF Token for Django
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(result => {
+            // Handle the response (e.g., show a success message or redirect)
+            if (result.success) {
+                alert('Рахунок успішно створено!');
+            } else {
+                alert('Помилка при створенні рахунку.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Щось пішло не так.');
+        });
+    } else {
+        alert('Будь ласка, виберіть клієнта і послуги.');
+    }
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 </script>
 
 {% endblock %}

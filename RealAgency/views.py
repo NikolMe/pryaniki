@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
@@ -399,5 +401,30 @@ def search_services(request):
 def search_clients(request):
     query = request.GET.get('q', '')
     clients = Client.objects.filter(name__icontains=query)[:5]
-    client_data = [{'name': client.name, 'iin': client.iin} for client in clients]
+    client_data = [{'id': client.id, 'name': client.name, 'iin': client.iin} for client in clients]
     return JsonResponse(client_data, safe=False)
+
+
+def create_invoice(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        client_id = data.get('client_id')
+        service_ids = data.get('service_ids', [])
+        discount_ids = data.get('discount_ids', [])
+
+        # Fetch the client, services, and discounts
+        client = Client.objects.get(id=client_id)
+        services = Service.objects.filter(id__in=service_ids)
+        discounts = Discount.objects.filter(id__in=discount_ids)
+
+        # Create the invoice logic here
+        # You might need to create an Invoice object, add services, discounts, etc.
+        invoice = Invoice.objects.create(client=client)
+
+        # You can also link the services and discounts to the invoice
+        invoice.services.add(*services)
+        invoice.discounts.add(*discounts)
+
+        return JsonResponse({'success': True, 'invoice_id': invoice.id})
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
