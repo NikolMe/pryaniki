@@ -7,7 +7,9 @@
             <div class="container mx-auto px-4">
                 <div class="flex justify-between items-center mb-8">
                     <h1 class="text-2xl">База даних клієнтів</h1>
-                    <button id="open-modal" class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                    <button
+                            {% if "Manager" in user_groups %} style="display:block;" {% else %} style="display:none;" {% endif %}
+                            id="open-modal" class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
                         <i class="fa-solid fa-plus mr-2"></i>Додати клієнта
                     </button>
                 </div>
@@ -20,7 +22,9 @@
                                 <th class="px-6 py-3 text-left text-sm text-neutral-600">Тип</th>
                                 <th class="px-6 py-3 text-left text-sm text-neutral-600">Адреса</th>
                                 <th class="px-6 py-3 text-left text-sm text-neutral-600">Контакти</th>
-                                <th class="px-6 py-3 text-center text-sm text-neutral-600">Дії</th>
+                                <th
+                                        {% if "Manager" in user_groups %} style="display:block;" {% else %} style="display:none;" {% endif %}
+                                        class="px-6 py-3 text-center text-sm text-neutral-600">Дії</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-100">
@@ -34,9 +38,11 @@
                         <div>{{ client.email }}</div>
                         <div class="text-neutral-500">{{ client.phone }}</div>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-4"
+                            {% if "Manager" in user_groups %} style="display:block;" {% else %} style="display:none;" {% endif %}>
                         <div class="flex space-x-2">
-                            <button class="edit-client text-neutral-600 hover:text-neutral-900"
+                            <button
+                                    class="edit-client text-neutral-600 hover:text-neutral-900"
                         data-id="{{ client.id }}"
                         data-name="{{ client.name }}"
                         data-type="{{ client.client_type.id }}"
@@ -50,7 +56,8 @@
                     </button>
 
                     <!-- Delete Button -->
-                    <button id="delete-client" class="delete-client text-neutral-600 hover:text-neutral-900" data-id="{{ client.id }}">
+                    <button
+                            id="delete-client" class="delete-client text-neutral-600 hover:text-neutral-900" data-id="{{ client.id }}">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                         </div>

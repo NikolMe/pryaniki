@@ -33,7 +33,9 @@
                 </div>
             </div>
             <div id="add-invoice" class="flex justify-end mb-6">
-                <button id="add-invoice-btn" class="bg-neutral-900 text-white px-6 py-3 rounded-lg hover:bg-neutral-800">
+                <button
+                        {% if "Notary" in user_groups %} style="display:block;" {% else %} style="display:none;" {% endif %}
+                        id="add-invoice-btn" class="bg-neutral-900 text-white px-6 py-3 rounded-lg hover:bg-neutral-800">
                     <i class="fa-solid fa-plus mr-2"></i>Додати рахунок
                 </button>
             </div>
@@ -46,7 +48,9 @@
                             <th class="px-6 py-3 text-left text-sm text-neutral-600">Клієнт</th>
                             <th class="px-6 py-3 text-left text-sm text-neutral-600">Файл</th>
                             <th class="px-6 py-3 text-left text-sm text-neutral-600">Сума</th>
-                            <th class="px-6 py-3 text-center text-sm text-neutral-600">Дії</th>
+                            <th
+                                    {% if "Notary" in user_groups %} style="display:block;" {% else %} style="display:none;" {% endif %}
+                                    class="px-6 py-3 text-center text-sm text-neutral-600">Дії</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-200">
@@ -70,10 +74,9 @@
                             <td class="px-6 py-4 text-sm">{{ payment.commission }} UAH</td>
                             <td class="px-6 py-4">
                                 <div class="flex justify-center space-x-3">
-                                    <button class="text-neutral-600 hover:text-neutral-900">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </button>
-                                    <button class="text-neutral-600 hover:text-neutral-900">
+                                    <button
+                                            {% if "Manager" in user_groups %} style="display:block;" {% else %} style="display:none;" {% endif %}
+                                            class="text-neutral-600 hover:text-neutral-900">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>

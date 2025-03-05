@@ -21,7 +21,9 @@
                     </select>
 
                     <div class="col-span-2 flex justify-end">
-                        <button id="add-service" class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                        <button
+                                {% if "Manager" in user_groups %} style="display:block;" {% else %} style="display:none;" {% endif %}
+                                id="add-service" class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
                             <i class="fa-solid fa-plus mr-2"></i>Додати нову послугу
                         </button>
                     </div>
@@ -34,7 +36,9 @@
                                 <th class="px-6 py-3 text-left text-sm text-neutral-600">Назва</th>
                                 <th class="px-6 py-3 text-left text-sm text-neutral-600">Опис</th>
                                 <th class="px-6 py-3 text-left text-sm text-neutral-600">Вартість</th>
-                                <th class="px-6 py-3 text-central text-sm text-neutral-600">Дії</th>
+                                <th
+                                        {% if "Manager" in user_groups %} style="display:block;" {% else %} style="display:none;" {% endif %}
+                                        class="px-6 py-3 text-central text-sm text-neutral-600">Дії</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-neutral-200">
@@ -44,7 +48,8 @@
                                 <td class="px-6 py-4">{{ service.name }}</td>
                                 <td class="px-6 py-4">{{ service.description }}</td>
                                 <td class="px-6 py-4 text-left">{{ service.price }} UAH</td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4"
+                                        {% if "Manager" in user_groups %} style="display:block;" {% else %} style="display:none;" {% endif %}>
                                     <div class="flex justify-center space-x-3">
                                         <button class="edit-service text-neutral-600 hover:text-neutral-900"
                                                 data-id="{{ service.id }}"

@@ -1,0 +1,81 @@
+<style>
+    .button-style {
+        background-color: #101827;
+        color: white;
+        font-size: 18px;
+        border-radius: 8px;
+        border: none;
+        padding: 10px 20px;
+        margin-top: 20px;
+    }
+
+    .border-form {
+        font-family: "Inter", sans-serif;
+        padding: 20px;
+        border-radius: 10px;
+        border: #d1d5db solid 1px;
+        width: 30vw;
+        margin: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.main-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full viewport height */
+    background-color: #f9fafb; /* Optional background */
+}
+
+    .border-form input {
+        font-size: 18px;
+        border: #d1d5db solid 1px;
+        background-color: white;
+        padding: 7px;
+        border-radius: 8px;
+    }
+
+    input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+    box-shadow: 0 0 0px 1000px white inset;
+    -webkit-text-fill-color: #000; /* Optional: to set text color */
+}
+
+        @media (max-width: 768px) {
+            .border-form {
+                width: 90vw;
+    }
+        }
+
+    .login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers the button horizontally */
+}
+    .info {
+        color: #9ca3af;
+        font-size: 14px;
+        text-align: center;
+    }
+</style>
+
+<main class="main-center">
+    <div class="border-form">
+        <p>Для подальшої роботи з застосунком Pryaniki PRIME, будь ласка, увійдіть в аккаунт.</p>
+        <form class="login-form" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="button-style">Увійти</button>
+        </form>
+        <div>
+        <p class="info">У разі виникнення будь-яких запитань звʼяжіться з нами info@notarypro.com.</p>
+            </div>
+    </div>
+</main>

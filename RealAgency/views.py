@@ -1,41 +1,83 @@
+from django.contrib.auth import login
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 
+from RealAgency.forms import CustomAuthenticationForm
 from RealAgency.models import Client, ClientType, Discount, Invoice, ProvidedService, Service
 
 
+def login_view(request):
+    if request.method == 'POST':
+        form = CustomAuthenticationForm(request, data=request.POST)  # Use your custom form
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('/')  # Redirect to the homepage after login
+        else:
+            return render(request, 'login/login.html', {'form': form})
+    else:
+        form = CustomAuthenticationForm()
+        return render(request, 'login/login.html', {'form': form})
+
+def role_required(roles):
+    def decorator(view_func):
+        def _wrapped_view(request, *args, **kwargs):
+            if not request.user.is_authenticated:
+                return redirect('login')
+
+            if not any(group.name in roles for group in request.user.groups.all()):
+                raise PermissionDenied("You are not permitted to perform this action.")
+
+            return view_func(request, *args, **kwargs)
+
+        return _wrapped_view
+
+    return decorator
+
+@role_required(['Manager', 'Notary'])
 def home(request):
     return render(request, 'main.html')
 
+@role_required(['Manager', 'Notary'])
 def clients(request):
     client_list = Client.objects.all().order_by('id')
     paginator = Paginator(client_list, 10)
+    user_groups = request.user.groups.values_list('name', flat=True)
 
     client_types = ClientType.objects.all()
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'clients/main.html', {'page_obj': page_obj, 'client_types': client_types })
+    return render(request, 'clients/main.html', {'page_obj': page_obj, 'client_types': client_types, 'user_groups': user_groups })
 
+@role_required(['Manager', 'Notary'])
 def discounts(request):
     discount_list = Discount.objects.all().order_by('id')
-    return render(request, 'discounts/main.html', { 'discounts': discount_list })
+    user_groups = request.user.groups.values_list('name', flat=True)
 
+    return render(request, 'discounts/main.html', { 'discounts': discount_list, 'user_groups': user_groups })
+
+@role_required(['Manager', 'Notary'])
 def payments(request):
     payments_list = Invoice.objects.all().order_by('id')
-    return render(request, 'invoices/main.html', {'invoices': payments_list})
+    user_groups = request.user.groups.values_list('name', flat=True)
 
+    return render(request, 'invoices/main.html', {'invoices': payments_list, 'user_groups': user_groups })
+
+@role_required(['Manager', 'Notary'])
 def provided_services(request):
     provided_services_list = ProvidedService.objects.all().order_by('id')
     return render(request, 'provided_services/main.html', { 'provided_services': provided_services_list })
 
-from django.shortcuts import render
-
+@role_required(['Manager', 'Notary'])
 def services(request):
     search_query = request.GET.get('search', '')
     sort_option = request.GET.get('sort', '')
+    user_groups = request.user.groups.values_list('name', flat=True)
 
     services_list = Service.objects.all()
 
@@ -57,11 +99,13 @@ def services(request):
 
     return render(request, 'services/main.html', {
         'services': services_list,
+        'user_groups': user_groups,
         'search_query': search_query,
         'sort_option': sort_option,
     })
 
 
+@role_required(['Manager'])
 def add_or_edit_client(request, client_id=None):
     if request.method == 'POST':
         client_id = request.POST.get('client_id')
@@ -98,6 +142,7 @@ def add_or_edit_client(request, client_id=None):
 
         return redirect('clients')
 
+@role_required(['Manager', 'Notary'])
 def add_or_edit_invoice(request, invoice_id=None):
     if request.method == 'POST':
         invoice_id = request.POST.get('invoice_id')
@@ -143,6 +188,7 @@ def add_or_edit_invoice(request, invoice_id=None):
 
         return redirect('invoices')
 
+@role_required(['Manager'])
 def add_or_edit_service(request, service_id=None):
     if request.method == 'POST':
         service_id = request.POST.get('service_id')
@@ -167,6 +213,7 @@ def add_or_edit_service(request, service_id=None):
 
         return redirect('services')
 
+@role_required(['Manager', 'Notary'])
 def add_or_edit_provided_service(request, provided_service_id=None):
     if request.method == 'POST':
         provided_service_id = request.POST.get('provided_service_id')
@@ -200,6 +247,7 @@ def add_or_edit_provided_service(request, provided_service_id=None):
 
         return redirect('provided_services')
 
+@role_required(['Manager', 'Notary'])
 def add_or_edit_discount(request, discount_id=None):
     if request.method == 'POST':
         discount_id = request.POST.get('discount_id')
@@ -222,16 +270,19 @@ def add_or_edit_discount(request, discount_id=None):
         return redirect('discounts')
 
 
+@role_required(['Manager'])
 def delete_client(request, client_id):
     client = get_object_or_404(Client, id=client_id)
     client.delete()
     return JsonResponse({"success": True})
 
+@role_required(['Manager'])
 def delete_discount(request, discount_id):
     discount = get_object_or_404(Discount, id=discount_id)
     discount.delete()
     return JsonResponse({"success": True})
 
+@role_required(['Manager'])
 def delete_payment(request, payment_id):
     payment = get_object_or_404(Invoice, id=payment_id)
     payment.delete()
@@ -242,7 +293,7 @@ def delete_provided_service(request, provided_service_id):
     provided_service.delete()
     return JsonResponse({"success": True})
 
-
+@role_required(['Manager'])
 @csrf_exempt
 def add_discount(request):
     if request.method == 'POST':
@@ -259,6 +310,7 @@ def add_discount(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 
+@role_required(['Manager'])
 @csrf_exempt
 def edit_discount(request, discount_id):
     discount = get_object_or_404(Discount, id=discount_id)
@@ -273,6 +325,7 @@ def edit_discount(request, discount_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 
+@role_required(['Manager'])
 @csrf_exempt
 def delete_discount(request, discount_id):
     if request.method == 'POST':
@@ -282,6 +335,7 @@ def delete_discount(request, discount_id):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
+@role_required(['Manager'])
 def add_service(request):
     if request.method == 'POST':
         Service.objects.create(
@@ -292,6 +346,7 @@ def add_service(request):
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
 
+@role_required(['Manager'])
 def edit_service(request, service_id):
     if request.method == 'POST':
         service = get_object_or_404(Service, id=service_id)
@@ -302,6 +357,7 @@ def edit_service(request, service_id):
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
 
+@role_required(['Manager'])
 def delete_service(request, service_id):
     if request.method == 'POST':
         service = get_object_or_404(Service, id=service_id)
@@ -309,10 +365,12 @@ def delete_service(request, service_id):
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=400)
 
+@role_required(['Notary'])
 def add_invoice(request):
     discount_list = Discount.objects.all().order_by('id')
     return render(request, 'invoices/add_invoice.html', {'discounts': discount_list})
 
+@role_required(['Manager', 'Notary'])
 def search_services(request):
     query = request.GET.get('q', '').strip()
     services = []
@@ -321,6 +379,7 @@ def search_services(request):
     return JsonResponse(services, safe=False)
 
 
+@role_required(['Manager', 'Notary'])
 def search_clients(request):
     query = request.GET.get('q', '')
     clients = Client.objects.filter(name__icontains=query)[:5]
