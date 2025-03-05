@@ -108,44 +108,63 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('service-search');
     const resultsContainer = document.getElementById('search-results');
     const selectedServices = document.getElementById('selected-services');
+    const clientSearchInput = document.getElementById('client-search');
+    const clientSearchResults = document.getElementById('client-search-results');
+    const clientNameDisplay = document.getElementById('client-name');
+    const clientIinDisplay = document.getElementById('client-iin');
+    const selectedClientInfo = document.getElementById('selected-client-info');
 
-    let debounceTimeout;
+    let debounceTimeout, clientDebounceTimeout;
 
-    searchInput.addEventListener('input', () => {
-        const query = searchInput.value.trim();
+    // Reusable function to handle search results and selection
+    function handleSearch(inputElement, resultsContainer, url, itemTemplate, onSelect) {
+        inputElement.addEventListener('input', () => {
+            const query = inputElement.value.trim();
 
-        clearTimeout(debounceTimeout);
+            clearTimeout(debounceTimeout);
 
-        if (query.length >= 2) {
-            debounceTimeout = setTimeout(() => {
-                fetch(`/search_services/?q=${encodeURIComponent(query)}`)
-                    .then(response => response.json())
-                    .then(services => {
-                        resultsContainer.innerHTML = '';
-                        if (services.length > 0) {
-                            services.forEach(service => {
-                                const item = document.createElement('div');
-                                item.className = 'px-4 py-2 hover:bg-neutral-100 cursor-pointer';
-                                item.textContent = `${service.name} - ${service.price} UAH`;
-                                item.addEventListener('click', () => {
-                                    addService(service);
-                                    resultsContainer.classList.add('hidden');
-                                    searchInput.value = '';
+            if (query.length >= 2) {
+                debounceTimeout = setTimeout(() => {
+                    fetch(`${url}?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            resultsContainer.innerHTML = '';
+                            if (data.length > 0) {
+                                data.forEach(item => {
+                                    const resultItem = document.createElement('div');
+                                    resultItem.className = 'px-4 py-2 hover:bg-neutral-100 cursor-pointer';
+                                    resultItem.textContent = itemTemplate(item);
+                                    resultItem.addEventListener('click', () => {
+                                        onSelect(item);
+                                        resultsContainer.classList.add('hidden');
+                                        inputElement.value = '';
+                                    });
+                                    resultsContainer.appendChild(resultItem);
                                 });
-                                resultsContainer.appendChild(item);
-                            });
-                            resultsContainer.classList.remove('hidden');
-                        } else {
-                            resultsContainer.innerHTML = '<div class="px-4 py-2 text-neutral-500">Нічого не знайдено</div>';
-                            resultsContainer.classList.remove('hidden');
-                        }
-                    });
-            }, 500);
-        } else {
-            resultsContainer.classList.add('hidden');
-        }
-    });
+                                resultsContainer.classList.remove('hidden');
+                            } else {
+                                resultsContainer.innerHTML = '<div class="px-4 py-2 text-neutral-500">Нічого не знайдено</div>';
+                                resultsContainer.classList.remove('hidden');
+                            }
+                        });
+                }, 500);
+            } else {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+    }
 
+    // Service search handling
+    handleSearch(searchInput, resultsContainer, '/search_services/',
+        service => `${service.name} - ${service.price} UAH`,
+        addService);
+
+    // Client search handling
+    handleSearch(clientSearchInput, clientSearchResults, '/search_clients/',
+        client => `${client.name} - ${client.iin}`,
+        selectClient);
+
+    // Function to add selected service
     function addService(service) {
         if (document.getElementById(`selected-service-${service.id}`)) return;
 
@@ -175,6 +194,14 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTotals();
     }
 
+    // Function to select client
+    function selectClient(client) {
+        clientNameDisplay.textContent = client.name;
+        clientIinDisplay.textContent = `Ідентифікаційний код: ${client.iin}`;
+        selectedClientInfo.classList.remove('hidden');
+    }
+
+    // Update totals (services and discounts)
     function updateTotals() {
         const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
         const discountCheckboxes = document.querySelectorAll('.discount-checkbox');
@@ -201,6 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
     }
 
+    // Event listener for checkboxes change (service or discount)
     document.addEventListener('change', (event) => {
         if (event.target.classList.contains('service-checkbox') || event.target.classList.contains('discount-checkbox')) {
             updateTotals();
@@ -208,59 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     updateTotals();
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const clientSearchInput = document.getElementById('client-search');
-    const clientSearchResults = document.getElementById('client-search-results');
-    const clientNameDisplay = document.getElementById('client-name');
-    const clientIinDisplay = document.getElementById('client-iin');
-    const selectedClientInfo = document.getElementById('selected-client-info');  // New reference to the info div
-
-    let clientDebounceTimeout;
-
-    clientSearchInput.addEventListener('input', () => {
-        const query = clientSearchInput.value.trim();
-
-        clearTimeout(clientDebounceTimeout);
-
-        if (query.length >= 2) {
-            clientDebounceTimeout = setTimeout(() => {
-                fetch(`/search_clients/?q=${encodeURIComponent(query)}`)
-                    .then(response => response.json())
-                    .then(clients => {
-                        clientSearchResults.innerHTML = '';
-                        if (clients.length > 0) {
-                            clients.forEach(client => {
-                                const item = document.createElement('div');
-                                item.className = 'px-4 py-2 hover:bg-neutral-100 cursor-pointer';
-                                item.textContent = `${client.name} - ${client.iin}`;
-                                item.addEventListener('click', () => {
-                                    selectClient(client);
-                                    clientSearchResults.classList.add('hidden');
-                                    clientSearchInput.value = '';
-                                });
-                                clientSearchResults.appendChild(item);
-                            });
-                            clientSearchResults.classList.remove('hidden');
-                        } else {
-                            clientSearchResults.innerHTML = '<div class="px-4 py-2 text-neutral-500">Нічого не знайдено</div>';
-                            clientSearchResults.classList.remove('hidden');
-                        }
-                    });
-            }, 500);
-        } else {
-            clientSearchResults.classList.add('hidden');
-        }
-    });
-
-    function selectClient(client) {
-        clientNameDisplay.textContent = client.name;
-        clientIinDisplay.textContent = `Ідентифікаційний код: ${client.iin}`;
-
-        // Show the client info section
-        selectedClientInfo.classList.remove('hidden');
-    }
 });
 </script>
 
