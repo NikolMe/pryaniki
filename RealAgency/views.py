@@ -31,9 +31,36 @@ def provided_services(request):
     provided_services_list = ProvidedService.objects.all().order_by('id')
     return render(request, 'provided_services/main.html', { 'provided_services': provided_services_list })
 
+from django.shortcuts import render
+
 def services(request):
-    services_list = Service.objects.all().order_by('id')
-    return render(request, 'services/main.html', { 'services': services_list })
+    search_query = request.GET.get('search', '')
+    sort_option = request.GET.get('sort', '')
+
+    services_list = Service.objects.all()
+
+    # Filter by search query if it's at least 2 characters
+    if len(search_query) >= 2:
+        services_list = services_list.filter(name__icontains=search_query)
+
+    # Apply sorting
+    if sort_option == 'name_asc':
+        services_list = services_list.order_by('name')
+    elif sort_option == 'name_desc':
+        services_list = services_list.order_by('-name')
+    elif sort_option == 'price_asc':
+        services_list = services_list.order_by('price')
+    elif sort_option == 'price_desc':
+        services_list = services_list.order_by('-price')
+    else:
+        services_list = services_list.order_by('id')
+
+    return render(request, 'services/main.html', {
+        'services': services_list,
+        'search_query': search_query,
+        'sort_option': sort_option,
+    })
+
 
 def add_or_edit_client(request, client_id=None):
     if request.method == 'POST':
