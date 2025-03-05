@@ -97,6 +97,14 @@
                     <button class="w-full border border-neutral-300 py-3 rounded-lg hover:bg-neutral-50">
                         <i class="fa-solid fa-print mr-2"></i>Попередній перегляд
                     </button>
+                    <div id="max-services-message" class="text-red-500 font-semibold mb-4" style="display:none;">
+                        Не можна додавати більше 20 послуг
+                    </div>
+
+                    <!-- Max Discount Message (hidden by default) -->
+                    <div id="max-discount-message" class="text-red-500 font-semibold mb-4" style="display:none;">
+                        Знижка не може бути більше 100
+                    </div>
                 </div>
             </div>
         </div>
@@ -209,9 +217,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const discountCheckboxes = document.querySelectorAll('.discount-checkbox');
 
     let servicesTotal = 0;
+    let selectedServicesCount = 0;
     serviceCheckboxes.forEach(checkbox => {
         if (checkbox.checked) {
             servicesTotal += parseFloat(checkbox.dataset.price);
+            selectedServicesCount++;
         }
     });
 
@@ -229,22 +239,39 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('discounts-sum').textContent = discountValue.toFixed(2) + ' UAH';
     document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
 
-    // Get the buttons
+    // Get the buttons and message containers
     const createInvoiceButton = document.querySelector('button.w-full.bg-neutral-900');
     const previewButton = document.querySelector('button.w-full.border');
+    const maxServicesMessage = document.getElementById('max-services-message');
+    const maxDiscountMessage = document.getElementById('max-discount-message');
 
     // Get the client info section
     const clientInfoSection = document.getElementById('selected-client-info');
 
-    // Check if servicesTotal is greater than 0 and client is selected
-    if (servicesTotal > 0 && !clientInfoSection.classList.contains('hidden')) {
+    // Hide the buttons and show appropriate messages based on conditions
+    if (selectedServicesCount > 20) {
+        createInvoiceButton.style.display = 'none';
+        previewButton.style.display = 'none';
+        maxServicesMessage.style.display = 'block';
+        maxDiscountMessage.style.display = 'none';
+    } else if (totalDiscountRate > 100) {
+        createInvoiceButton.style.display = 'none';
+        previewButton.style.display = 'none';
+        maxServicesMessage.style.display = 'none';
+        maxDiscountMessage.style.display = 'block';
+    } else if (servicesTotal > 0 && !clientInfoSection.classList.contains('hidden')) {
         createInvoiceButton.style.display = 'block';
         previewButton.style.display = 'block';
+        maxServicesMessage.style.display = 'none';
+        maxDiscountMessage.style.display = 'none';
     } else {
         createInvoiceButton.style.display = 'none';
         previewButton.style.display = 'none';
+        maxServicesMessage.style.display = 'none';
+        maxDiscountMessage.style.display = 'none';
     }
 }
+
 
     // Event listener for checkboxes change (service or discount)
     document.addEventListener('change', (event) => {
