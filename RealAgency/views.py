@@ -1,4 +1,6 @@
+import datetime
 import json
+import random
 
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
@@ -405,6 +407,11 @@ def search_clients(request):
     return JsonResponse(client_data, safe=False)
 
 
+import random
+from datetime import datetime
+from django.http import JsonResponse
+from .models import Invoice, Client, Service, Discount, ProvidedService
+
 def create_invoice(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -412,19 +419,60 @@ def create_invoice(request):
         service_ids = data.get('service_ids', [])
         discount_ids = data.get('discount_ids', [])
 
-        # Fetch the client, services, and discounts
         client = Client.objects.get(id=client_id)
         services = Service.objects.filter(id__in=service_ids)
         discounts = Discount.objects.filter(id__in=discount_ids)
 
-        # Create the invoice logic here
-        # You might need to create an Invoice object, add services, discounts, etc.
-        invoice = Invoice.objects.create(client=client)
+        invoice_code = ''.join([str(random.randint(0, 9)) for _ in range(5)])
 
-        # You can also link the services and discounts to the invoice
-        invoice.services.add(*services)
-        invoice.discounts.add(*discounts)
+        current_date = datetime.now().date()
+
+        invoice_file_path = f"{client.name}_invoice_{current_date.day}_{current_date.strftime('%b').lower()}_{str(current_date.year)[2:]}.pdf"
+
+        pdv = 20  # PDV is 20%
+        commission = 10  # Commission is 10% (static)
+
+        total_discount_rate = sum([discount.rate for discount in discounts])
+        total_price = sum([service.price for service in services])
+        total_price = float(total_price)
+        total_discount_rate = float(total_discount_rate)
+        total_pdv = total_price * ((100 - total_discount_rate) / 100)
+        total_no_pdv = total_pdv * ((100 - pdv) / 100)
+        commission_amount_no_pdv = total_no_pdv * commission
+
+        invoice = Invoice.objects.create(
+            client=client,
+            date=current_date,
+            code=invoice_code,
+            invoice_file_path=invoice_file_path,
+            commission=commission,
+            discount=total_discount_rate,
+            pdv=pdv,
+            commission_amount_no_pdv=commission_amount_no_pdv,
+            services_total_no_pdv=0,
+            total_no_pdv=total_no_pdv,
+            total_pdv=total_pdv
+        )
+
+        for service in services:
+            price = service.price
+
+            total_service_pdv = float(price) * ((100 - total_discount_rate) / 100)
+            total_service_no_pdv= total_service_pdv * ((100 - pdv) / 100)
+
+            provided_service = ProvidedService.objects.create(
+                invoice=invoice,
+                service=service,
+                amount=1,
+                price=price,
+                pdv=pdv,
+                total_no_pdv=total_service_no_pdv,
+                total_pdv=total_service_pdv
+            )
+
+        invoice.save()
 
         return JsonResponse({'success': True, 'invoice_id': invoice.id})
+
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
