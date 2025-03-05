@@ -14,18 +14,26 @@
                 </div>
                 <div id="service-form" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div class="lg:col-span-2">
-                        <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
-                            <h2 class="text-2xl mb-6">Оберіть клієнта</h2>
-                            <div class="flex space-x-2">
-                                <input type="text" id="client-search" placeholder="Пошук клієнта..."
+                        <!-- Client Search Section -->
+                            <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
+                                <h2 class="text-2xl mb-6">Оберіть клієнта</h2>
+                                <div class="flex space-x-2 relative">
+                                    <input type="text" id="client-search" placeholder="Пошук клієнта..."
                                         class="flex-1 border rounded-lg px-4 py-2">
-                                <div id="add-client" class="flex justify-end">
-                                    <button class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
-                                        <i class="fa-solid fa-plus mr-2"></i>Додати нового клієнта
-                                    </button>
+                                    <div id="client-search-results"
+                                        class="absolute top-full left-0 w-full bg-white border rounded-lg mt-1 shadow-lg z-10 hidden">
+                                    </div>
+                                </div>
+
+                            <div class="flex items-center justify-between p-4 border rounded-lg hover:bg-neutral-50">
+                                    <div class="flex items-start space-x-4">
+                                        <div>
+                                            <h3 id="client-name" class="text-lg">Користувач</h3>
+                                            <p id="client-iin" class="text-neutral-600">Ідентифікаційний код: 38023801232</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         <div class="bg-white rounded-xl border border-neutral-200 p-6 mb-6">
                             <h2 class="text-2xl mb-6">Оберіть послуги</h2>
                             <div class="flex space-x-2 relative">
@@ -36,7 +44,6 @@
                                 </div>
                             </div>
                             <div id="selected-services" class="space-y-4 mt-4">
-                                <!-- Selected services will appear here -->
                             </div>
                         </div>
                         <div class="bg-white rounded-xl border border-neutral-200 p-6">
@@ -198,6 +205,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Call on page load to make sure everything is initialized
     updateTotals();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const clientSearchInput = document.getElementById('client-search');
+    const clientSearchResults = document.getElementById('client-search-results');
+    const clientNameDisplay = document.getElementById('client-name');
+    const clientIinDisplay = document.getElementById('client-iin');
+
+    let clientDebounceTimeout;
+
+    clientSearchInput.addEventListener('input', () => {
+        const query = clientSearchInput.value.trim();
+
+        clearTimeout(clientDebounceTimeout);
+
+        if (query.length >= 2) {
+            clientDebounceTimeout = setTimeout(() => {
+                fetch(`/search_clients/?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(clients => {
+                        clientSearchResults.innerHTML = '';
+                        if (clients.length > 0) {
+                            clients.forEach(client => {
+                                const item = document.createElement('div');
+                                item.className = 'px-4 py-2 hover:bg-neutral-100 cursor-pointer';
+                                item.textContent = `${client.name} - ${client.iin}`;
+                                item.addEventListener('click', () => {
+                                    selectClient(client);
+                                    clientSearchResults.classList.add('hidden');
+                                    clientSearchInput.value = '';
+                                });
+                                clientSearchResults.appendChild(item);
+                            });
+                            clientSearchResults.classList.remove('hidden');
+                        } else {
+                            clientSearchResults.innerHTML = '<div class="px-4 py-2 text-neutral-500">Нічого не знайдено</div>';
+                            clientSearchResults.classList.remove('hidden');
+                        }
+                    });
+            }, 500);
+        } else {
+            clientSearchResults.classList.add('hidden');
+        }
+    });
+
+    function selectClient(client) {
+        // Replace the displayed client data with the selected client info
+        clientNameDisplay.textContent = client.name;
+        clientIinDisplay.textContent = `Ідентифікаційний код: ${client.iin}`;
+    }
 });
 </script>
 

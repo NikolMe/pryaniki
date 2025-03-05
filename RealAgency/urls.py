@@ -3,7 +3,7 @@ from django.urls import path
 
 from RealAgency.views import home, clients, discounts, payments, provided_services, services, \
     add_or_edit_client, delete_client, add_discount, delete_discount, edit_discount, add_service, edit_service, \
-    delete_service, add_invoice, search_services
+    delete_service, add_invoice, search_services, search_clients
 
 urlpatterns = [
     #    path('admin/', admin.site.urls),
@@ -31,5 +31,8 @@ urlpatterns = [
     path('add_invoice/', add_invoice, name='add_invoice'),
 
     path('search_services/', search_services, name='search_services'),
+
+    path('search_clients/', search_clients, name='search_clients'),
+
 ]
 

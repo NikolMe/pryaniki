@@ -319,3 +319,10 @@ def search_services(request):
     if len(query) >= 2:
         services = list(Service.objects.filter(name__icontains=query).values('id', 'name', 'description', 'price')[:5])
     return JsonResponse(services, safe=False)
+
+
+def search_clients(request):
+    query = request.GET.get('q', '')
+    clients = Client.objects.filter(name__icontains=query)[:5]
+    client_data = [{'name': client.name, 'iin': client.iin} for client in clients]
+    return JsonResponse(client_data, safe=False)
