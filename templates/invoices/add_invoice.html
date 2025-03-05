@@ -199,6 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clientNameDisplay.textContent = client.name;
         clientIinDisplay.textContent = `Ідентифікаційний код: ${client.iin}`;
         selectedClientInfo.classList.remove('hidden');
+
+        updateTotals();
     }
 
     // Update totals (services and discounts)
@@ -231,8 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const createInvoiceButton = document.querySelector('button.w-full.bg-neutral-900');
     const previewButton = document.querySelector('button.w-full.border');
 
-    // Check if servicesTotal is greater than 0 and show/hide buttons
-    if (servicesTotal > 0) {
+    // Get the client info section
+    const clientInfoSection = document.getElementById('selected-client-info');
+
+    // Check if servicesTotal is greater than 0 and client is selected
+    if (servicesTotal > 0 && !clientInfoSection.classList.contains('hidden')) {
         createInvoiceButton.style.display = 'block';
         previewButton.style.display = 'block';
     } else {
