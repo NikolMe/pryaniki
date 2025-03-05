@@ -19,7 +19,6 @@
                             <div class="flex space-x-2">
                                 <input type="text" id="client-search" placeholder="Пошук клієнта..."
                                         class="flex-1 border rounded-lg px-4 py-2">
-
                                 <div id="add-client" class="flex justify-end">
                                     <button class="bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
                                         <i class="fa-solid fa-plus mr-2"></i>Додати нового клієнта
@@ -89,8 +88,8 @@
             </div>
         </main>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
+<script>
+document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('service-search');
     const resultsContainer = document.getElementById('search-results');
     const selectedServices = document.getElementById('selected-services');
@@ -141,7 +140,7 @@
 
         wrapper.innerHTML = `
             <div class="flex items-start space-x-4">
-                <input type="checkbox" class="mt-1" checked>
+                <input type="checkbox" class="service-checkbox mt-1" checked data-price="${service.price}">
                 <div>
                     <h3 class="text-lg">${service.name}</h3>
                     <p class="text-neutral-600">${service.description}</p>
@@ -150,51 +149,56 @@
             <span class="text-lg">${service.price} UAH</span>
         `;
 
+        // Listen for checkbox changes to trigger the total update
         wrapper.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+            updateTotals();
             if (!e.target.checked) {
                 wrapper.remove();
             }
         });
 
         selectedServices.appendChild(wrapper);
+
+        // Manually update totals after adding a new service
+        updateTotals();
     }
 
     function updateTotals() {
-    const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
-    const discountCheckboxes = document.querySelectorAll('.discount-checkbox');
+        const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
+        const discountCheckboxes = document.querySelectorAll('.discount-checkbox');
 
-    let servicesTotal = 0;
-    serviceCheckboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            servicesTotal += parseFloat(checkbox.dataset.price);
-        }
-    });
+        let servicesTotal = 0;
+        serviceCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                servicesTotal += parseFloat(checkbox.dataset.price);
+            }
+        });
 
-    let totalDiscountRate = 0;
-    discountCheckboxes.forEach(checkbox => {
-        if (checkbox.checked) {
-            totalDiscountRate += parseFloat(checkbox.dataset.rate);
-        }
-    });
+        let totalDiscountRate = 0;
+        discountCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                totalDiscountRate += parseFloat(checkbox.dataset.rate);
+            }
+        });
 
-    const discountValue = servicesTotal * (totalDiscountRate / 100);
-    const finalTotal = servicesTotal - discountValue;
+        const discountValue = servicesTotal * (totalDiscountRate / 100);
+        const finalTotal = servicesTotal - discountValue;
 
-    document.getElementById('selected-services-sum').textContent = servicesTotal.toFixed(2) + ' UAH';
-    document.getElementById('discounts-sum').textContent = discountValue.toFixed(2) + ' UAH';
-    document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
-}
-
-// Update totals when services or discounts change
-document.addEventListener('change', (event) => {
-    if (event.target.classList.contains('service-checkbox') || event.target.classList.contains('discount-checkbox')) {
-        updateTotals();
+        document.getElementById('selected-services-sum').textContent = servicesTotal.toFixed(2) + ' UAH';
+        document.getElementById('discounts-sum').textContent = discountValue.toFixed(2) + ' UAH';
+        document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
     }
-});
 
-// Call on page load to make sure everything is initialized
-updateTotals();
+    // Update totals when services or discounts change
+    document.addEventListener('change', (event) => {
+        if (event.target.classList.contains('service-checkbox') || event.target.classList.contains('discount-checkbox')) {
+            updateTotals();
+        }
+    });
 
+    // Call on page load to make sure everything is initialized
+    updateTotals();
 });
-    </script>
+</script>
+
 {% endblock %}
