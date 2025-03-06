@@ -83,10 +83,8 @@ def payments(request):
 def provided_services(request):
     provided_services_list = ProvidedService.objects.all().order_by('id')
 
-    # Pagination: 15 items per page
-    paginator = Paginator(provided_services_list, 15)
+    paginator = Paginator(provided_services_list, 10)
 
-    # Get the current page number from the request
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
