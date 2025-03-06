@@ -149,7 +149,7 @@
 
                     <!-- Max Discount Message (hidden by default) -->
                     <div id="max-discount-message" class="text-red-500 font-semibold mb-4" style="display:none;">
-                        Знижка не може бути більше 100
+                        Знижка не може становити більше 100%
                     </div>
                 </div>
             </div>
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Update totals (services and discounts)
-    function updateTotals() {
+function updateTotals() {
     const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
     const discountCheckboxes = document.querySelectorAll('.discount-checkbox');
 
@@ -282,7 +282,6 @@ document.addEventListener('DOMContentLoaded', () => {
     discountCheckboxes.forEach(checkbox => {
         if (checkbox.checked) {
             totalDiscountRate += parseFloat(checkbox.dataset.rate);
-                        console.log(checkbox.dataset.id);
             selectedDiscountIds.push(checkbox.dataset.id);
         }
     });
@@ -293,6 +292,16 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('selected-services-sum').textContent = servicesTotal.toFixed(2) + ' UAH';
     document.getElementById('discounts-sum').textContent = discountValue.toFixed(2) + ' UAH';
     document.getElementById('total-sum').textContent = finalTotal.toFixed(2) + ' UAH';
+
+    // Get the summary div (the one to hide)
+    const summaryDiv = document.querySelector('.border-t.pt-4');
+
+    // Hide the summary div if discount is more than 100%
+    if (totalDiscountRate > 100) {
+        summaryDiv.style.display = 'none';
+    } else {
+        summaryDiv.style.display = 'block';
+    }
 
     window.selectedServiceIds = selectedServiceIds;
     window.selectedDiscountIds = selectedDiscountIds;
