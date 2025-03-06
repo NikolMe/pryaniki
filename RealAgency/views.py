@@ -1,11 +1,16 @@
 import datetime
 import json
 import random
+from io import BytesIO
 
+from PyPDF2 import PdfReader, PdfWriter
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import pikepdf
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import PermissionDenied
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
@@ -476,3 +481,56 @@ def create_invoice(request):
 
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
+
+
+def generate_invoice_preview(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        client_id = data.get('client_id')
+        service_ids = data.get('service_ids', [])
+        discount_ids = data.get('discount_ids', [])
+
+        client = Client.objects.get(id=client_id)
+        services = Service.objects.filter(id__in=service_ids)
+        discounts = Discount.objects.filter(id__in=discount_ids)
+
+        original_pdf_path = 'RealAgency/media/invoice.pdf'
+        original_pdf = PdfReader(original_pdf_path)
+
+        clientName = client.name
+        total_price = sum([service.price for service in services])
+
+        # Create overlay PDF
+        overlay_buffer = BytesIO()
+        c = canvas.Canvas(overlay_buffer, pagesize=letter)
+        c.setFont("Helvetica", 12)
+        c.drawString(100, 700, f"Client: {client.name}")
+        c.drawString(100, 680, f"Total Price: {total_price:.2f} UAH")
+        c.save()
+        overlay_buffer.seek(0)
+
+        overlay_pdf = PdfReader(overlay_buffer)
+
+        # Merge overlay with original
+        output_pdf = PdfWriter()
+        original_page = original_pdf.pages[0]
+        overlay_page = overlay_pdf.pages[0]
+        original_page.merge_page(overlay_page)
+        output_pdf.add_page(original_page)
+
+        # Add the rest of the pages if needed
+        for page in original_pdf.pages[1:]:
+            output_pdf.add_page(page)
+
+        final_pdf_buffer = BytesIO()
+        output_pdf.write(final_pdf_buffer)
+        final_pdf_buffer.seek(0)
+
+        response = HttpResponse(final_pdf_buffer, content_type='application/pdf')
+        response['Content-Disposition'] = 'inline; filename="updated_invoice.pdf"'
+
+        return response
+
+    return HttpResponse(status=400)
+
+
