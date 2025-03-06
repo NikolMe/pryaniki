@@ -121,8 +121,8 @@ def generate_invoice_pdf(invoice, provided_services):
             num,
             service.id,
             service.service.name,
-            f"{price_without_pdv:.2f} UAH",
-            f"{service.price:.2f} UAH",
+            f"{price_without_pdv:.2f}",
+            f"{service.price:.2f}",
         ])
 
 
@@ -136,6 +136,8 @@ def generate_invoice_pdf(invoice, provided_services):
     total_price = float(sum([service.price for service in provided_services]))
     total_pdv = total_price * ((100 - total_discount_rate) / 100)
     pdv_amount = total_pdv * (PDV_RATE / 100)
+    discount = total_price * (total_discount_rate / 100)
+    without_pdv = total_pdv - pdv_amount
 
     c.drawString(177, 724, f"{formatted_date} №{invoice.code}")
     c.drawString(241, 616, f"{formatted_date} №{invoice.code}")
@@ -144,33 +146,48 @@ def generate_invoice_pdf(invoice, provided_services):
     c.drawString(101, 158, f"{total_pdv:.2f}, {format_currency(total_pdv)}")
     c.drawString(105, 148, f"{pdv_amount:.2f}")
 
+    services_data.append(["Знижка", "", "", "", f"{discount:.2f}"])
+    services_data.append(["Разом без ПДВ", "", "", "", f"{without_pdv:.2f}"])
+    services_data.append(["Усього з ПДВ", "", "", "", f"{total_pdv:.2f}"])
+
+    total_rows = len(services_data)
+
     table = Table(services_data, colWidths=[7 * mm, 13 * mm, 100 * mm, 40 * mm, 40 * mm])
-    table.setStyle(TableStyle([
+    styles = [
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('ALIGN', (0, 1), (-3, total_rows - 4), 'LEFT'),
+        ('ALIGN', (-2, 1), (-1, total_rows - 4), 'RIGHT'),
+        ('ALIGN', (0, total_rows - 3), (-1, total_rows - 1), 'RIGHT'),
         ('FONTNAME', (0, 0), (-1, -1), 'DejaVuSans'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
-    ]))
+    ]
 
-    # Draw table on canvas
+    num_services = len(provided_services)
+    styles += [
+        ('SPAN', (0, num_services + 1), (3, num_services + 1)),  # Total row
+        ('SPAN', (0, num_services + 2), (3, num_services + 2)),  # Discount row
+        ('SPAN', (0, num_services + 3), (3, num_services + 3)),  # PDV row
+    ]
+
+    table.setStyle(TableStyle(styles))
+
     table.wrapOn(c, 100, 500)
-    table.drawOn(c, 30, 500)
+    table.drawOn(c, 30, 400)
 
     c.save()
     overlay_buffer.seek(0)
 
     overlay_pdf = PdfReader(overlay_buffer)
 
-    # Merge overlay onto first page
     output_pdf = PdfWriter()
     original_page = original_pdf.pages[0]
     overlay_page = overlay_pdf.pages[0]
     original_page.merge_page(overlay_page)
     output_pdf.add_page(original_page)
 
-    # Add remaining pages if necessary
     for page in original_pdf.pages[1:]:
         output_pdf.add_page(page)
 
@@ -182,17 +199,15 @@ def generate_invoice_pdf(invoice, provided_services):
 
 
 def format_currency(total_pdv):
-    # Total is divided into the integer and fractional parts
     integer_part = int(total_pdv)
     fractional_part = round((total_pdv - integer_part) * 100)
 
-    # Get words for the integer part (in Ukrainian)
     integer_words = num2words(integer_part, lang='uk', to='cardinal')
 
     # Determine the correct plural form for "гривня"
     integer_part_ost = integer_part % 10
     if integer_part_ost == 1:
-        integer_words += " гривня"
+        integer_words += " гривні"
     elif 2 <= integer_part_ost <= 4:
         integer_words += " гривні"
     else:
