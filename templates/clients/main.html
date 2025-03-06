@@ -100,7 +100,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const modalOverlay = document.getElementById('modal-overlay');
     const openModalBtn = document.getElementById('open-modal');
-    const closeModalBtn = document.getElementById('close-modal');
+    const closeModalBtns = document.querySelectorAll('#close-modal'); // Select all close buttons
     const clientForm = document.getElementById('client-form');
 
     document.querySelectorAll('.edit-client').forEach(button => {
@@ -120,10 +120,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    closeModalBtns.forEach(button => {
+        button.addEventListener('click', function () {
+            modalOverlay.classList.add('hidden');
+        });
+    });
+
     openModalBtn.addEventListener('click', function () {
         modalOverlay.classList.remove('hidden');
     });
 
+    modalOverlay.addEventListener('click', function (event) {
+        if (event.target === modalOverlay) {
+            modalOverlay.classList.add('hidden');
+        }
+    });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
