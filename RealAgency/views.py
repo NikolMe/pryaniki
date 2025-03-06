@@ -66,7 +66,7 @@ def discounts(request):
 
 @role_required(['Manager', 'Notary'])
 def payments(request):
-    payments_list = Invoice.objects.all().order_by('id')
+    payments_list = Invoice.objects.all().order_by('-date')  # Replace 'date_created' with the actual date field name
     user_groups = request.user.groups.values_list('name', flat=True)
 
     # Pagination: 15 items per page
@@ -303,9 +303,14 @@ def delete_discount(request, discount_id):
 
 @role_required(['Manager'])
 def delete_payment(request, payment_id):
-    payment = get_object_or_404(Invoice, id=payment_id)
-    payment.delete()
-    return JsonResponse({"success": True})
+    if request.method == 'DELETE':
+        payment = get_object_or_404(Invoice, id=payment_id)
+
+        ProvidedService.objects.filter(invoice=payment).delete()
+
+        payment.delete()
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False, "message": "Invalid request method."})
 
 def delete_provided_service(request, provided_service_id):
     provided_service = get_object_or_404(ProvidedService, id=provided_service_id)

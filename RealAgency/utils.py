@@ -54,7 +54,7 @@ def generate_preview_invoice(client, services, discounts):
     total_price = float(sum([service.price for service in services]))
     total_pdv = total_price * ((100 - total_discount_rate) / 100)
     pdv_amount = total_pdv * (PDV_RATE / 100)
-    without_pdv = total_price - pdv_amount
+    without_pdv = total_pdv - pdv_amount
     discount = total_price * (total_discount_rate / 100)
 
     c.drawString(177, 724, f"{formatted_date}")
