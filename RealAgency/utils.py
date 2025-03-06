@@ -2,6 +2,7 @@ import locale
 from datetime import datetime
 from io import BytesIO
 
+from num2words import num2words
 from reportlab.lib import colors
 from reportlab.lib.fonts import addMapping
 from reportlab.lib.units import mm
@@ -22,7 +23,6 @@ def generate_invoice_pdf(client, services, discounts):
     # Create overlay PDF with dynamic data
     overlay_buffer = BytesIO()
     c = canvas.Canvas(overlay_buffer, pagesize=letter)
-    c.setFont("DejaVuSans", 8)
 
     PDV_RATE = 20  # example 20%
 
@@ -43,7 +43,7 @@ def generate_invoice_pdf(client, services, discounts):
         ])
 
 
-    c.setFont("DejaVuSans", 12)
+    c.setFont("DejaVuSans", 8)
 
     locale.setlocale(locale.LC_TIME, 'uk_UA.UTF-8')
     now = datetime.now()
@@ -59,8 +59,8 @@ def generate_invoice_pdf(client, services, discounts):
     c.drawString(241, 616, f"{formatted_date}")
     c.drawString(114, 642, f"{client.name}")
     c.drawString(150, 167, f"{num}")
-    c.drawString(101, 158, f"{total_pdv}:.2f")
-    c.drawString(105, 148, f"{pdv_amount}:.2f")
+    c.drawString(101, 158, f"{total_pdv:.2f}, {format_currency(total_pdv)}")
+    c.drawString(105, 148, f"{pdv_amount:.2f}")
 
     table = Table(services_data, colWidths=[7 * mm, 13 * mm, 100 * mm, 40 * mm, 40 * mm])
     table.setStyle(TableStyle([
@@ -98,3 +98,30 @@ def generate_invoice_pdf(client, services, discounts):
 
     return final_pdf_buffer
 
+def format_currency(total_pdv):
+    # Total is divided into the integer and fractional parts
+    integer_part = int(total_pdv)
+    fractional_part = round((total_pdv - integer_part) * 100)
+
+    # Get words for the integer part (in Ukrainian)
+    integer_words = num2words(integer_part, lang='uk', to='cardinal')
+
+    # Determine the correct plural form for "гривня"
+    integer_part_ost = integer_part % 10
+    if integer_part_ost == 1:
+        integer_words += " гривня"
+    elif 2 <= integer_part_ost <= 4:
+        integer_words += " гривні"
+    else:
+        integer_words += " гривень"
+
+    # Get words for the fractional part (kopecks)
+    if fractional_part == 1:
+        fractional_words = f"{num2words(fractional_part, lang='uk', to='cardinal')} копійка"
+    elif 2 <= fractional_part <= 4:
+        fractional_words = f"{num2words(fractional_part, lang='uk', to='cardinal')} копійки"
+    else:
+        fractional_words = f"{num2words(fractional_part, lang='uk', to='cardinal')} копійок"
+
+    # Combine both parts into the final formatted string
+    return f"{integer_words} {fractional_words}"
