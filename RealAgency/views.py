@@ -47,7 +47,7 @@ def home(request):
 
 @role_required(['Manager', 'Notary'])
 def clients(request):
-    client_list = Client.objects.all().order_by('id')
+    client_list = Client.objects.all().order_by('-id')
     paginator = Paginator(client_list, 10)
     user_groups = request.user.groups.values_list('name', flat=True)
 
@@ -287,6 +287,7 @@ def add_or_edit_discount(request, discount_id=None):
         return redirect('discounts')
 
 
+@csrf_exempt
 @role_required(['Manager'])
 def delete_client(request, client_id):
     client = get_object_or_404(Client, id=client_id)

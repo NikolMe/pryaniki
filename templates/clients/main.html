@@ -125,6 +125,43 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("click", function (event) {
+        if (event.target.closest(".delete-client")) {
+            const button = event.target.closest(".delete-client");
+            const clientId = button.dataset.id;
+
+            if (confirm("Ви впевнені, що хочете видалити цього клієнта?")) {
+                fetch(`/delete_client/${clientId}/`, {
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRFToken": getCSRFToken(),
+                        "Content-Type": "application/json",
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Клієнта успішно видалено!");
+                        button.closest("tr").remove(); // Видалити рядок з таблиці
+                    } else {
+                        alert("Помилка видалення клієнта.");
+                    }
+                })
+                .catch(error => console.error("Помилка:", error));
+            }
+        }
+    });
+
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split("; ")
+            .find(row => row.startsWith("csrftoken="))
+            ?.split("=")[1];
+        return cookieValue;
+    }
+});
 </script>
 
 {% endblock %}
