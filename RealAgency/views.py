@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from RealAgency.forms import CustomAuthenticationForm
 from RealAgency.models import ClientType
-from .utils import generate_invoice_pdf
+from .utils import generate_invoice_pdf, generate_preview_invoice
 
 
 def login_view(request):
@@ -491,10 +491,30 @@ def generate_invoice_preview(request):
         except Client.DoesNotExist:
             return JsonResponse({'error': 'Client not found'}, status=404)
 
-        final_pdf_buffer = generate_invoice_pdf(client, services, discounts)
+        final_pdf_buffer = generate_preview_invoice(client, services, discounts)
 
         response = HttpResponse(final_pdf_buffer, content_type='application/pdf')
         response['Content-Disposition'] = 'inline; filename="invoice_preview.pdf"'
+        return response
+
+    return HttpResponse(status=400)
+
+
+def generate_invoice(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        invoice_id = data.get('invoice_id')
+
+        try:
+            invoice = Invoice.objects.get(id=invoice_id)
+            provided_services = ProvidedService.objects.filter(invoice=invoice)
+        except Invoice.DoesNotExist:
+            return JsonResponse({'error': 'Invoice not found'}, status=404)
+
+        final_pdf_buffer = generate_invoice_pdf(invoice, provided_services)
+
+        response = HttpResponse(final_pdf_buffer, content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{invoice.invoice_file_path}.pdf"'
         return response
 
     return HttpResponse(status=400)
