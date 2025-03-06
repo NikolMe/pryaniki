@@ -38,8 +38,8 @@ def generate_preview_invoice(client, services, discounts):
             num,
             service.id,
             service.name,
-            f"{price_without_pdv:.2f} UAH",
-            f"{service.price:.2f} UAH",
+            f"{price_without_pdv:.2f}",
+            f"{service.price:.2f}",
         ])
 
 
@@ -54,6 +54,8 @@ def generate_preview_invoice(client, services, discounts):
     total_price = float(sum([service.price for service in services]))
     total_pdv = total_price * ((100 - total_discount_rate) / 100)
     pdv_amount = total_pdv * (PDV_RATE / 100)
+    without_pdv = total_price - pdv_amount
+    discount = total_price * (total_discount_rate / 100)
 
     c.drawString(177, 724, f"{formatted_date}")
     c.drawString(241, 616, f"{formatted_date}")
@@ -62,19 +64,37 @@ def generate_preview_invoice(client, services, discounts):
     c.drawString(101, 158, f"{total_pdv:.2f}, {format_currency(total_pdv)}")
     c.drawString(105, 148, f"{pdv_amount:.2f}")
 
+    services_data.append(["Знижка", "", "", "", f"{discount:.2f}"])
+    services_data.append(["Разом без ПДВ", "", "", "", f"{without_pdv:.2f}"])
+    services_data.append(["Усього з ПДВ", "", "", "", f"{total_pdv:.2f}"])
+
+    total_rows = len(services_data)
+
     table = Table(services_data, colWidths=[7 * mm, 13 * mm, 100 * mm, 40 * mm, 40 * mm])
-    table.setStyle(TableStyle([
+    styles = [
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+        ('ALIGN', (0, 1), (-3, total_rows - 4), 'LEFT'),
+        ('ALIGN', (-2, 1), (-1, total_rows - 4), 'RIGHT'),
+        ('ALIGN', (0, total_rows - 3), (-1, total_rows - 1), 'RIGHT'),
         ('FONTNAME', (0, 0), (-1, -1), 'DejaVuSans'),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('GRID', (0, 0), (-1, -1), 1, colors.black),
-    ]))
+    ]
+
+    num_services = len(services)
+    styles += [
+        ('SPAN', (0, num_services + 1), (3, num_services + 1)),  # Total row
+        ('SPAN', (0, num_services + 2), (3, num_services + 2)),  # Discount row
+        ('SPAN', (0, num_services + 3), (3, num_services + 3)),  # PDV row
+    ]
+
+    table.setStyle(TableStyle(styles))
 
     # Draw table on canvas
     table.wrapOn(c, 100, 500)
-    table.drawOn(c, 30, 500)
+    table.drawOn(c, 30, 400)
 
     c.save()
     overlay_buffer.seek(0)
