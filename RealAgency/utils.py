@@ -137,8 +137,8 @@ def generate_invoice_pdf(invoice, provided_services):
     total_pdv = total_price * ((100 - total_discount_rate) / 100)
     pdv_amount = total_pdv * (PDV_RATE / 100)
 
-    c.drawString(177, 724, f"{formatted_date}")
-    c.drawString(241, 616, f"{formatted_date}")
+    c.drawString(177, 724, f"{formatted_date} №{invoice.code}")
+    c.drawString(241, 616, f"{formatted_date} №{invoice.code}")
     c.drawString(114, 642, f"{invoice.client.name}")
     c.drawString(150, 167, f"{num}")
     c.drawString(101, 158, f"{total_pdv:.2f}, {format_currency(total_pdv)}")
