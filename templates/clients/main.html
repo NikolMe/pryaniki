@@ -49,7 +49,7 @@
                         data-address="{{ client.address }}"
                         data-phone="{{ client.phone }}"
                         data-email="{{ client.email }}"
-                        data-passporst_id="{{ client.passport_id }}"
+                        data-passport_id="{{ client.passport_id }}"
                         data-iin="{{ client.iin }}"
                         data-edrpou="{{ client.edrpou }}">
                         <i class="fa-solid fa-pen"></i>
@@ -100,7 +100,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const modalOverlay = document.getElementById('modal-overlay');
     const openModalBtn = document.getElementById('open-modal');
-    const closeModalBtns = document.querySelectorAll('#close-modal'); // Select all close buttons
+    const closeModalBtns = document.querySelectorAll('#close-modal');
     const clientForm = document.getElementById('client-form');
 
     document.querySelectorAll('.edit-client').forEach(button => {
