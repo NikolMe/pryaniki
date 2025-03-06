@@ -10,10 +10,34 @@
                 <p class="text-neutral-600">Перегляд і керування записів транзакцій</p>
             </div>
             <div id="filters" class="bg-neutral-50 p-6 rounded-xl mb-8">
-                <!-- Filters section -->
-            </div>
-            <div id="actions" class="flex justify-end mb-6">
-                <!-- Actions section -->
+                <div class="grid grid-cols-3 gap-4">
+                    <!-- Service Search -->
+                    <div class="relative">
+                        <label for="service-search" class="block text-sm font-medium text-gray-700">Тип послуги</label>
+                        <input type="text" id="service-search" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                               placeholder="Введіть назву послуги">
+                        <ul id="service-results" class="absolute w-full bg-white border border-gray-300 rounded-md hidden"></ul>
+                    </div>
+
+                    <!-- Client Search -->
+                    <div class="relative">
+                        <label for="client-search" class="block text-sm font-medium text-gray-700">Ім'я клієнта</label>
+                        <input type="text" id="client-search" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                               placeholder="Введіть ім'я клієнта">
+                        <ul id="client-results" class="absolute w-full bg-white border border-gray-300 rounded-md hidden"></ul>
+                    </div>
+
+                    <!-- Date Selection -->
+                    <div>
+                        <label for="date-filter" class="block text-sm font-medium text-gray-700">Дата</label>
+                        <input type="date" id="date-filter" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
+                    </div>
+                    <div class="flex items-end">
+                    <button id="apply-filters" class="w-full bg-neutral-900 text-white px-4 py-2 rounded-lg hover:bg-neutral-800">
+                            <i class="fa-solid fa-filter mr-2"></i>Застосувати
+                    </button>
+                </div>
+                </div>
             </div>
             <div id="transactions-table" class="bg-white rounded-xl border border-neutral-200 overflow-hidden">
                 <table class="w-full">
@@ -65,4 +89,119 @@
             </div>
         </div>
     </main>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const serviceInput = document.getElementById("service-search");
+    const clientInput = document.getElementById("client-search");
+    const serviceResults = document.getElementById("service-results");
+    const clientResults = document.getElementById("client-results");
+    const applyFiltersBtn = document.getElementById("apply-filters");
+
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func(...args), delay);
+        };
+    }
+
+    function fetchSuggestions(input, url, resultsContainer) {
+        const query = input.value.trim();
+        if (query.length < 2) {
+            resultsContainer.innerHTML = "";
+            resultsContainer.classList.add("hidden");
+            return;
+        }
+
+        fetch(`${url}?q=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                resultsContainer.innerHTML = "";
+                if (data.length === 0) {
+                    resultsContainer.classList.add("hidden");
+                    return;
+                }
+
+                data.forEach(item => {
+                    const li = document.createElement("li");
+                    li.textContent = item.name;
+                    li.classList.add("p-2", "cursor-pointer", "hover:bg-gray-200");
+                    li.addEventListener("click", () => {
+                        input.value = item.name;
+                        input.dataset.selectedId = item.id;
+                        resultsContainer.innerHTML = "";
+                        resultsContainer.classList.add("hidden");
+                    });
+                    resultsContainer.appendChild(li);
+                });
+
+                resultsContainer.classList.remove("hidden");
+            })
+            .catch(error => console.error("Error fetching suggestions:", error));
+    }
+
+    // Debounced event listeners for live search
+    serviceInput.addEventListener("input", debounce(() => {
+        fetchSuggestions(serviceInput, "/search_services/", serviceResults);
+    }, 300));
+
+    clientInput.addEventListener("input", debounce(() => {
+        fetchSuggestions(clientInput, "/search_clients/", clientResults);
+    }, 300));
+
+    // Hide dropdowns when clicking outside
+    document.addEventListener("click", (e) => {
+        if (!serviceInput.contains(e.target) && !serviceResults.contains(e.target)) {
+            serviceResults.classList.add("hidden");
+        }
+        if (!clientInput.contains(e.target) && !clientResults.contains(e.target)) {
+            clientResults.classList.add("hidden");
+        }
+    });
+
+    // Apply filters when the button is clicked
+    applyFiltersBtn.addEventListener("click", () => {
+        const serviceId = serviceInput.dataset.selectedId || "";
+        const clientId = clientInput.dataset.selectedId || "";
+        const selectedDate = document.getElementById("date-filter").value;
+
+        fetch(`/filter_provided_services/?service_id=${serviceId}&client_id=${clientId}&date=${selectedDate}`)
+    .then(response => response.json())
+    .then(data => {
+        const tableBody = document.querySelector("#transactions-table tbody");
+        tableBody.innerHTML = "";
+
+        if (data.length === 0) {
+            tableBody.innerHTML = "<tr><td colspan='6' class='text-center py-4'>Нічого не знайдено</td></tr>";
+            return;
+        }
+
+        data.forEach(payment => {
+            console.log(payment);  // Debugging: Check what is actually received
+
+            const row = `
+                <tr class="hover:bg-neutral-50">
+                    <td class="px-6 py-4 text-sm">#${payment.id}</td>
+                    <td class="px-6 py-4 text-sm">${payment.date}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div>
+                                <div class="text-sm">${payment.client?.name || "Unknown Client"}</div>
+                                <div class="text-xs text-neutral-500">ID: ${payment.client?.id || "N/A"}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm">${payment.service?.name || "Unknown Service"}</td>
+                    <td class="px-6 py-4 text-sm">${payment.price ? `${payment.price} UAH` : "N/A"}</td>
+                </tr>
+            `;
+            tableBody.insertAdjacentHTML("beforeend", row);
+        });
+    })
+    .catch(error => console.error("Error filtering services:", error));
+
+    });
+});
+</script>
+
 {% endblock %}

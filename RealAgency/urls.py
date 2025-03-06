@@ -4,7 +4,7 @@ from django.urls import path
 from RealAgency.views import home, clients, discounts, payments, provided_services, services, \
     add_or_edit_client, delete_client, add_discount, delete_discount, edit_discount, add_service, edit_service, \
     delete_service, add_invoice, search_services, search_clients, login_view, create_invoice, generate_invoice_preview, \
-    generate_invoice, delete_payment
+    generate_invoice, delete_payment, filter_provided_services, filter_invoices
 
 urlpatterns = [
     #    path('admin/', admin.site.urls),
@@ -44,5 +44,9 @@ urlpatterns = [
     path('generate_invoice/', generate_invoice, name='generate_invoice'),
 
     path('delete_payment/<int:payment_id>/', delete_payment, name='delete_payment'),
+
+    path('filter_provided_services/', filter_provided_services, name='filter_provided_services'),
+
+    path('filter_invoices/', filter_invoices, name='filter_invoices'),
 ]
 

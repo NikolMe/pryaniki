@@ -523,3 +523,71 @@ def generate_invoice(request):
     return HttpResponse(status=400)
 
 
+def filter_provided_services(request):
+    service_id = request.GET.get('service_id', '')
+    client_id = request.GET.get('client_id', '')
+    date = request.GET.get('date', '')
+
+    filters = {}
+    if service_id:
+        filters['service__id'] = service_id
+    if client_id:
+        filters['invoice__client__id'] = client_id
+    if date:
+        filters['invoice__date'] = date
+
+    provided_services = ProvidedService.objects.filter(**filters)
+
+    provided_services_data = []
+    for ps in provided_services:
+        provided_services_data.append({
+            "id": ps.id,
+            "date": ps.invoice.date.strftime("%Y-%m-%d"),  # Directly accessible
+            "client": {
+                "id": ps.invoice.client.id,
+                "name": ps.invoice.client.name
+            },
+            "service": {
+                "id": ps.service.id,
+                "name": ps.service.name
+            },
+            "amount": ps.amount,
+            "price": float(ps.price),
+            "total_pdv": float(ps.total_pdv)
+        })
+
+    return JsonResponse(provided_services_data, safe=False)
+
+
+
+def filter_invoices(request):
+    service_id = request.GET.get('service_id', '')
+    client_id = request.GET.get('client_id', '')
+    date = request.GET.get('date', '')
+
+    invoices = Invoice.objects.all()
+
+    if client_id:
+        invoices = invoices.filter(client__id=client_id)
+    if date:
+        invoices = invoices.filter(date=date)
+    if service_id:
+        invoices = invoices.filter(providedservice__service__id=service_id).distinct()
+
+    # Ensure client data is properly formatted
+    invoices_data = [
+        {
+            "id": invoice.id,
+            "date": invoice.date.strftime("%Y-%m-%d"),  # Convert date to string
+            "client": {
+                "id": invoice.client.id,
+                "name": invoice.client.name
+            },
+            "invoice_file_path": invoice.invoice_file_path,
+            "total_no_pdv": float(invoice.total_no_pdv),  # Convert Decimal to float
+            "total_pdv": float(invoice.total_pdv),
+        }
+        for invoice in invoices
+    ]
+
+    return JsonResponse(invoices_data, safe=False)
