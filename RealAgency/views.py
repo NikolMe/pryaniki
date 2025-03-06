@@ -48,14 +48,24 @@ def home(request):
 @role_required(['Manager', 'Notary'])
 def clients(request):
     client_list = Client.objects.all().order_by('-id')
+
+    # Map passport_id to an empty string if it is None
+    for client in client_list:
+        if client.passport_id is None:
+            client.passport_id = ''
+
     paginator = Paginator(client_list, 10)
     user_groups = request.user.groups.values_list('name', flat=True)
-
     client_types = ClientType.objects.all()
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'clients/main.html', {'page_obj': page_obj, 'client_types': client_types, 'user_groups': user_groups })
+
+    return render(request, 'clients/main.html', {
+        'page_obj': page_obj,
+        'client_types': client_types,
+        'user_groups': user_groups
+    })
 
 @role_required(['Manager', 'Notary'])
 def discounts(request):
