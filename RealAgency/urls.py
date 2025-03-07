@@ -41,7 +41,7 @@ urlpatterns = [
 
     path('generate_invoice_preview/', generate_invoice_preview, name='generate_invoice_preview'),
 
-    path('generate_invoice/', generate_invoice, name='generate_invoice'),
+    path('generate_invoice/<int:invoice_id>/', generate_invoice, name='generate_invoice'),
 
     path('delete_payment/<int:payment_id>/', delete_payment, name='delete_payment'),
 

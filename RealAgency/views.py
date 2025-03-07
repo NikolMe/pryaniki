@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 
 from django.contrib.auth import login
 from django.core.exceptions import PermissionDenied
@@ -514,24 +515,19 @@ def generate_invoice_preview(request):
     return HttpResponse(status=400)
 
 
-def generate_invoice(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        invoice_id = data.get('invoice_id')
+def generate_invoice(request, invoice_id):
+    try:
+        invoice = Invoice.objects.get(id=invoice_id)
+        provided_services = ProvidedService.objects.filter(invoice=invoice)
+    except Invoice.DoesNotExist:
+        return HttpResponse('Invoice not found', status=404)
 
-        try:
-            invoice = Invoice.objects.get(id=invoice_id)
-            provided_services = ProvidedService.objects.filter(invoice=invoice)
-        except Invoice.DoesNotExist:
-            return JsonResponse({'error': 'Invoice not found'}, status=404)
+    final_pdf_buffer = generate_invoice_pdf(invoice, provided_services)
+    filename = re.sub(r'[^\w\d-]', '_', invoice.invoice_file_path)
 
-        final_pdf_buffer = generate_invoice_pdf(invoice, provided_services)
-
-        response = HttpResponse(final_pdf_buffer, content_type='application/pdf')
-        response['Content-Disposition'] = f'inline; filename="{invoice.invoice_file_path}.pdf"'
-        return response
-
-    return HttpResponse(status=400)
+    response = HttpResponse(final_pdf_buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}.pdf"'
+    return response
 
 
 def filter_provided_services(request):

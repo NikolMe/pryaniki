@@ -75,7 +75,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm">
-                                <a href="#" class="text-blue-600 hover:underline" onclick="generateInvoice({{ payment.id }})">
+                                <a href="/generate_invoice/{{ payment.id }}/" target="_blank" class="text-blue-600 hover:underline">
                                     <i class="fa-solid fa-file-pdf mr-2"></i>{{ payment.invoice_file_path }}
                                 </a>
                             </td>
@@ -120,29 +120,6 @@
 document.getElementById('add-invoice-btn').addEventListener('click', () => {
     window.location.href = '/add_invoice/';
 });
-
-function generateInvoice(invoiceId) {
-    fetch('/generate_invoice/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),
-        },
-        body: JSON.stringify({ invoice_id: invoiceId }),
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Failed to generate invoice');
-        return response.blob();
-    })
-    .then(blob => {
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-    })
-    .catch(error => {
-        console.error(error);
-        alert('Failed to generate invoice');
-    });
-}
 
 // CSRF token getter
 function getCookie(name) {
@@ -286,7 +263,7 @@ function deletePayment(paymentId) {
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-sm">
-                                <a href="#" class="text-blue-600 hover:underline" onclick="generateInvoice(${payment.id})">
+                                <a href="/generate_invoice/${ payment.id }/" target="_blank" class="text-blue-600 hover:underline">
                                     <i class="fa-solid fa-file-pdf mr-2"></i>${payment.invoice_file_path}
                                 </a>
                             </td>
