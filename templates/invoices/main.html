@@ -10,26 +10,27 @@
                 <p class="text-neutral-600">Перегляд і керування рахунками</p>
             </div>
             <div id="filters" class="bg-neutral-50 p-6 rounded-xl mb-8">
-                <div class="grid grid-cols-3 gap-4">
-                    <!-- Service Search -->
-                    <div class="relative">
-                        <label for="service-search" class="block text-sm font-medium text-gray-700">Тип послуги</label>
-                        <input type="text" id="service-search" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                               placeholder="Введіть назву послуги">
-                        <ul id="service-results" class="absolute w-full bg-white border border-gray-300 rounded-md hidden"></ul>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                     <!-- Client Search -->
-                    <div class="relative">
-                        <label for="client-search" class="block text-sm font-medium text-gray-700">Ім'я клієнта</label>
+                    <div>
+                        <label for="client-search" class="block text-sm text-neutral-600 mb-2">Ім'я клієнта</label>
                         <input type="text" id="client-search" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
                                placeholder="Введіть ім'я клієнта">
                         <ul id="client-results" class="absolute w-full bg-white border border-gray-300 rounded-md hidden"></ul>
                     </div>
 
+                    <!-- Service Search -->
+                    <div>
+                        <label for="service-search" class="block text-sm text-neutral-600 mb-2">Тип послуги</label>
+                        <input type="text" id="service-search" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                               placeholder="Введіть назву послуги">
+                        <ul id="service-results" class="absolute w-full bg-white border border-gray-300 rounded-md hidden"></ul>
+                    </div>
+
                     <!-- Date Selection -->
                     <div>
-                        <label for="date-filter" class="block text-sm font-medium text-gray-700">Дата</label>
+                        <label for="date-filter" class="block text-sm text-neutral-600 mb-2">Дата</label>
                         <input type="date" id="date-filter" class="mt-1 block w-full p-2 border border-gray-300 rounded-md">
                     </div>
                     <div class="flex items-end">

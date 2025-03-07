@@ -10,21 +10,22 @@
                 <p class="text-neutral-600">Перегляд і керування записів транзакцій</p>
             </div>
             <div id="filters" class="bg-neutral-50 p-6 rounded-xl mb-8">
-                <div class="grid grid-cols-3 gap-4">
-                    <!-- Service Search -->
-                    <div class="relative">
-                        <label for="service-search" class="block text-sm font-medium text-gray-700">Тип послуги</label>
-                        <input type="text" id="service-search" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                               placeholder="Введіть назву послуги">
-                        <ul id="service-results" class="absolute w-full bg-white border border-gray-300 rounded-md hidden"></ul>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
                     <!-- Client Search -->
-                    <div class="relative">
+                    <div>
                         <label for="client-search" class="block text-sm font-medium text-gray-700">Ім'я клієнта</label>
                         <input type="text" id="client-search" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
                                placeholder="Введіть ім'я клієнта">
                         <ul id="client-results" class="absolute w-full bg-white border border-gray-300 rounded-md hidden"></ul>
+                    </div>
+
+                    <!-- Service Search -->
+                    <div>
+                        <label for="service-search" class="block text-sm font-medium text-gray-700">Тип послуги</label>
+                        <input type="text" id="service-search" class="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                               placeholder="Введіть назву послуги">
+                        <ul id="service-results" class="absolute w-full bg-white border border-gray-300 rounded-md hidden"></ul>
                     </div>
 
                     <!-- Date Selection -->
