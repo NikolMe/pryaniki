@@ -359,11 +359,12 @@
                     <div>
                         <h4 class="mb-4">Інструменти</h4>
                         <ul class="space-y-2 text-neutral-400">
-                            <li>Клієнти</li>
-                            <li>Послуги</li>
-                            <li>Рахунки на оплату</li>
-                            <li>Надані послуги</li>
-                            <li>Знижка</li>
+                            <li><a href="{% url 'clients' %}">Клієнти</a></li>
+                            <li><a href="{% url 'services' %}">Послуги</a></li>
+                            <li><a href="{% url 'invoices' %}">Рахунки на оплату</a></li>
+                            <li><a href="{% url 'provided_services' %}">Надані послуги</a></li>
+                            <li><a href="{% url 'discounts' %}">Знижка</a></li>
+                            <li><a href="{% url 'logout' %}">Вйити</a></li>
                         </ul>
                     </div>
                     <div>

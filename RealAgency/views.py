@@ -2,7 +2,7 @@ import datetime
 import json
 import re
 
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.http import HttpResponse
@@ -598,3 +598,7 @@ def filter_invoices(request):
     ]
 
     return JsonResponse(invoices_data, safe=False)
+
+def custom_logout(request):
+    logout(request)
+    return redirect("login")
