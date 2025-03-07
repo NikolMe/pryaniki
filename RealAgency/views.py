@@ -553,7 +553,7 @@ def filter_provided_services(request):
     for ps in provided_services:
         provided_services_data.append({
             "id": ps.id,
-            "date": ps.invoice.date.strftime("%Y-%m-%d"),  # Directly accessible
+            "date": ps.invoice.date,
             "client": {
                 "id": ps.invoice.client.id,
                 "name": ps.invoice.client.name
@@ -589,7 +589,7 @@ def filter_invoices(request):
     invoices_data = [
         {
             "id": invoice.id,
-            "date": invoice.date.strftime("%Y-%m-%d"),  # Convert date to string
+            "date": invoice.date,
             "client": {
                 "id": invoice.client.id,
                 "name": invoice.client.name

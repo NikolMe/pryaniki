@@ -130,7 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
             serviceIdInput.value = button.dataset.id;
             serviceNameInput.value = button.dataset.name;
             serviceDescriptionInput.value = button.dataset.description;
-            servicePriceInput.value = button.dataset.price;
+            let price = button.dataset.price;
+            servicePriceInput.value = price ? price.replace(',', '.').trim() : '';
             openModal();
         });
     });

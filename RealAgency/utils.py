@@ -92,9 +92,11 @@ def generate_preview_invoice(client, services, discounts):
 
     table.setStyle(TableStyle(styles))
 
+    start_y = 520 - (num_services * 20)
+
     # Draw table on canvas
     table.wrapOn(c, 100, 500)
-    table.drawOn(c, 30, 400)
+    table.drawOn(c, 30, start_y)
 
     c.save()
     overlay_buffer.seek(0)
@@ -194,8 +196,11 @@ def generate_invoice_pdf(invoice, provided_services):
 
     table.setStyle(TableStyle(styles))
 
+    start_y = 520 - (num_services * 20)
+
+    # Draw table on canvas
     table.wrapOn(c, 100, 500)
-    table.drawOn(c, 30, 400)
+    table.drawOn(c, 30, start_y)
 
     c.save()
     overlay_buffer.seek(0)
@@ -227,7 +232,7 @@ def format_currency(total_pdv):
     # Determine the correct plural form for "гривня"
     integer_part_ost = integer_part % 10
     if integer_part_ost == 1:
-        integer_words += " гривні"
+        integer_words += " гривня"
     elif 2 <= integer_part_ost <= 4:
         integer_words += " гривні"
     else:
